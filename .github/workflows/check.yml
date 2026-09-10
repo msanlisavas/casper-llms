@@ -8,7 +8,6 @@ on:
     - cron: "41 5 * * 1"   # Mondays 05:41 UTC, after the regenerate run
   workflow_dispatch:
 
-# Least privilege: read-only by default; the one job below may also write issues.
 permissions:
   contents: read
 
@@ -17,11 +16,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check:
+  # Talks to every listed host, so it gets no write scope at all. check.py exits 0 when there is
+  # nothing to fix, 3 when the report lists findings, and anything else when it crashed.
+  probe:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
-      issues: write
+    outputs:
+      status: ${{ steps.probe.outputs.status }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,10 +40,37 @@ jobs:
           set +e
           python scripts/check.py --report report.md
           echo "status=$?" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: weekly-check-report
+          path: report.md
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # Writes issues and nothing else, from the report alone; it never touches a listed host.
+  issue:
+    needs: probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Fail on a crashed check
+        env:
+          STATUS: ${{ needs.probe.outputs.status }}
+        run: |
+          if [ "$STATUS" != "0" ] && [ "$STATUS" != "3" ]; then
+            echo "check.py crashed (exit status '$STATUS'); see the probe job's log. The tracking issue was not touched."
+            exit 1
+          fi
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.probe.outputs.status == '3'
+        with:
+          name: weekly-check-report
       - name: Open, update or close the tracking issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          STATUS: ${{ steps.probe.outputs.status }}
+          STATUS: ${{ needs.probe.outputs.status }}
         run: |
           set -euo pipefail
           number=$(gh issue list --repo "$GITHUB_REPOSITORY" --label weekly-check --state open \
@@ -51,8 +81,8 @@ jobs:
             fi
             exit 0
           fi
-          if [ "$STATUS" != "1" ]; then
-            echo "check.py failed with exit status $STATUS"
+          if [ ! -s report.md ]; then
+            echo "The probe reported findings but left no report."
             exit 1
           fi
           if [ -n "$number" ]; then

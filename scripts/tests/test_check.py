@@ -91,6 +91,72 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(check.probe_entry(api, get, refuse_post, ok_fetch), [])
 
 
+class RobustnessTests(unittest.TestCase):
+    """Found by review: one misbehaving host must not take the whole weekly report down."""
+
+    def test_a_probe_that_raises_becomes_a_finding(self):
+        def boom(entry):
+            raise ConnectionResetError("reset by peer")
+        self.assertEqual(check.safe_probe(MCP, boom), ["probe failed: ConnectionResetError"])
+
+    def test_a_version_lookup_that_exits_is_reported_not_fatal(self):
+        def fails():
+            raise SystemExit("latest release of casper-network/casper-node failed with HTTP 502")
+        latest, problems = check.latest_versions({"casper-node"}, {"casper-node": fails})
+        self.assertEqual(latest, {})
+        self.assertIn("could not determine the latest casper-node", problems[0])
+
+    def test_a_trickling_response_hits_the_deadline(self):
+        import time
+
+        class Trickle:    # a keep-alive every 20 ms: each read succeeds, the whole never ends
+            def read1(self, n):
+                time.sleep(0.02)
+                return b": keep-alive\n"
+        with self.assertRaises(TimeoutError):
+            check.read_bounded(Trickle(), b'"jsonrpc"', seconds=0.1, cap=10**9)
+
+    def test_a_folded_content_type_cannot_carry_markdown_into_the_issue(self):
+        folded = "text/html\r\n \r\n ## Pwned [link](https://evil.example) @someone"
+        problem = check.probe_mcp("https://x/mcp", lambda url, body: (500, folded, ""))
+        self.assertNotIn("#", problem)
+        self.assertNotIn("@", problem)
+        self.assertIn("an unexpected content type", problem)
+        self.assertEqual(check.media_type("text/html; charset=utf-8"), "text/html")
+
+    def test_a_permanent_redirect_is_reported_as_a_move(self):
+        problem = check.probe_mcp("https://x/mcp", lambda url, body: (301, "", "https://y.example/mcp"))
+        self.assertIn("moved to `https://y.example/mcp`", problem)
+
+    def test_a_307_keeps_the_post_and_its_body(self):
+        import urllib.request
+        req = urllib.request.Request("https://x/mcp", data=b"{}", method="POST", headers={"Content-Type": "application/json"})
+        followed = check._McpRedirects().redirect_request(req, None, 307, "Temporary", {}, "https://y/mcp")
+        self.assertEqual((followed.get_method(), followed.data, followed.full_url), ("POST", b"{}", "https://y/mcp"))
+
+    def test_a_legacy_sse_server_is_probed_with_a_get(self):
+        sse = dict(MCP, transport=["sse"], url="https://mcp.example.org/sse")
+        stream = lambda url: (200, "text/event-stream", "event: endpoint\ndata: /messages?session=1\n")  # noqa: E731
+        self.assertEqual(check.probe_entry(sse, ok_get, refuse_post, ok_fetch, stream), [])
+        silent = lambda url: (200, "text/event-stream", ": keep-alive\n")  # noqa: E731
+        self.assertTrue(check.probe_entry(sse, ok_get, refuse_post, ok_fetch, silent))
+
+    def test_findings_and_a_clean_run_have_distinct_exit_codes(self):
+        import tempfile
+        saved = (check.safe_probe, catalog.load_json, catalog.local_guides)
+        try:
+            catalog.load_json = lambda path: {"capabilities": [MCP]}
+            catalog.local_guides = lambda root=None: ([], [])
+            report = Path(tempfile.mkdtemp()) / "report.md"
+            check.safe_probe = lambda entry: ["down"]
+            self.assertEqual(check.main(["--report", str(report)]), check.FINDINGS)
+            self.assertIn("down", report.read_text(encoding="utf-8"))
+            check.safe_probe = lambda entry: []
+            self.assertEqual(check.main([]), 0)
+        finally:
+            check.safe_probe, catalog.load_json, catalog.local_guides = saved
+
+
 class StaleGuideTests(unittest.TestCase):
     GUIDE = catalog.Guide("guides/a.md", "A", "Verified against casper-node v2.2.2 on 2026-09-10.",
                           {"casper-node": "v2.2.2"})

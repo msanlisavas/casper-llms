@@ -205,14 +205,21 @@ def released_docs_dir(repo: str, ref: str, root: str = "") -> str:
     serves versions.json[0] unless docusaurus.config.js sets lastVersion ("current" meaning
     docs/). Without a versions.json the site is unversioned and docs/ is what it serves."""
     status, _, config = http_get(raw_url(repo, ref, f"{root}docusaurus.config.js"))
+    if status not in (200, 404):
+        sys.exit(f"docusaurus.config.js of {repo} failed with HTTP {status}")
     # Anchored at line start, so a commented-out  // lastVersion: ...  line is ignored.
     explicit = re.search(r"^\s*lastVersion:\s*['\"]([^'\"]+)['\"]", config, re.M) if status == 200 else None
     if explicit:
         version = explicit.group(1)
         return f"{root}docs/" if version == "current" else f"{root}versioned_docs/version-{version}/"
     status, _, body = http_get(raw_url(repo, ref, f"{root}versions.json"))
-    if status != 200:
+    # Only a real 404 means "unversioned". A network error or a 5xx taken the same way would index
+    # the unreleased docs/ folder under the released page's links, and tell the weekly check the
+    # released version is "next".
+    if status == 404:
         return f"{root}docs/"
+    if status != 200:
+        sys.exit(f"versions.json of {repo} failed with HTTP {status}")
     return f"{root}versioned_docs/version-{json.loads(body)[0]}/"
 
 
@@ -632,12 +639,23 @@ def disambiguate(links: list[Link]) -> None:
 SELF_REPO, SELF_REF = "msanlisavas/casper-llms", "main"
 
 
-def fetch_markdown(url: str) -> tuple[str | None, str]:
-    status, content_type, body = http_get(url)
+MEDIA_TYPE = re.compile(r"[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,63}/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,63}")
+
+
+def media_type(content_type: str) -> str:
+    """A server's Content-Type as a bare media type, or a fixed phrase. The value is quoted in
+    reports that become GitHub issues, and http.client keeps folded header lines, so a raw
+    header could carry markdown - headings, links, @mentions - into a bot-authored issue."""
+    match = MEDIA_TYPE.fullmatch(content_type.split(";", 1)[0].strip())
+    return match[0].lower() if match else "an unexpected content type"
+
+
+def fetch_markdown(url: str, get: Callable[[str], tuple[int, str, str]] | None = None) -> tuple[str | None, str]:
+    status, content_type, body = (get or http_get)(url)
     if status != 200:
         return None, f"HTTP {status}"
     if "html" in content_type.lower():
-        return None, f"served as {content_type}"
+        return None, f"served as {media_type(content_type)}"
     if len(body.encode("utf-8")) < MIN_BYTES:
         return None, f"stub ({len(body)} bytes)"
     # GitBook answers a moved or mistyped .md path with 200 and a markdown "Page Not Found" page.
