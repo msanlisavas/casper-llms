@@ -101,22 +101,63 @@ def frontmatter(text: str) -> dict[str, str]:
     return fields
 
 
+TEMPLATE_SECTIONS = {"summary", "motivation", "abstract"}
+
+
+def humanize(name: str) -> str:
+    return re.sub(r"[-_]+", " ", name).strip().capitalize()
+
+
+def clean_title(title: str) -> str:
+    title = re.sub(r"\s*\{#[^}]*\}", "", title)                   # Docusaurus anchor: "Global State {#global-state-head}"
+    title = re.sub(r"^(\*\*|__)(.+)\1$", r"\2", title.strip())    # wrapping bold: "**Minting**"
+    return title.replace("`", "").strip()
+
+
 def title_of(text: str, path: str, fm: dict[str, str]) -> str:
     title = fm.get("title")
+    body = FRONTMATTER.sub("", text, count=1)
     if not title:
-        body = FRONTMATTER.sub("", text, count=1)
-        heading = re.search(r"^#\s+(.+?)\s*#*\s*$", body, re.M)
+        # A heading that OPENS the document names it, whatever its level; failing that, the first
+        # H1, then a setext H1 (a line underlined with ===). Taking the first H1 anywhere titled a
+        # CEP-78 client README after "**Minting**", a section 150 lines in.
+        heading = (re.match(r"(?:[ \t]*\n)*#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", body, re.M)
+                   or re.search(r"^#[ \t]+(.+?)[ \t]*#*[ \t]*$", body, re.M)
+                   or re.search(r"^(\S[^\n]*)\n=+[ \t]*$", body, re.M))
         title = heading.group(1) if heading else None
+    if title and clean_title(title).lower() == "title":
+        # An unfilled template heading: the CEP template opens with "# Title", and three merged CEPs
+        # kept it. The next H2 names the proposal - unless it is the template's own "Summary".
+        following = re.search(r"^##[ \t]+(.+?)[ \t]*$", body, re.M)
+        title = following.group(1) if following and clean_title(following.group(1)).lower() not in TEMPLATE_SECTIONS else None
     # Agent skills name themselves in frontmatter; some open with a bare "# Skill" heading,
     # which says nothing to a reader or a search index. Two of Odra's six did.
-    if path.endswith("SKILL.md") and fm.get("name") and (not title or title.strip().lower() == "skill"):
-        title = re.sub(r"[-_]+", " ", fm["name"]).strip().capitalize() + " skill"
+    if path.endswith("SKILL.md") and fm.get("name") and (not title or clean_title(title).lower() == "skill"):
+        title = humanize(fm["name"]) + " skill"
     if not title:
         stem = path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
-        title = re.sub(r"[-_]+", " ", stem).strip().capitalize()
+        parent = path.rsplit("/", 1)[0] if "/" in path else ""
+        if stem.upper().startswith("README"):
+            # e.g. the Go SDK's types/key/README.md -> "types/key README"
+            title = (f"{parent} README" if parent else "README") + (" (advanced)" if "ADVANCED" in stem.upper() else "")
+        else:
+            title = humanize(strip_number_prefix(stem))   # 0057-checksummed-addresses -> Checksummed addresses
     # The link grammar is  - [title](url)  with no ']' allowed in the title.
-    title = re.sub(r"`", "", title).replace("[", "(").replace("]", ")")
+    title = clean_title(title).replace("[", "(").replace("]", ")")
     return re.sub(r"\s+", " ", title).strip() or path
+
+
+def latest_release(repo: str) -> str:
+    """The tag of a repository's latest release. Always the TAG, never a release branch:
+    casper-node's release-2.2.1 branch has moved past its tag and now carries unreleased text."""
+    status, _, body = http_get(f"https://api.github.com/repos/{repo}/releases/latest", api=True)
+    if status != 200:
+        sys.exit(f"latest release of {repo} failed with HTTP {status}")
+    return json.loads(body)["tag_name"]
+
+
+def version_key(tag: str) -> tuple[int, ...]:
+    return tuple(int(n) for n in re.findall(r"\d+", tag)[:3])
 
 
 # ----------------------------------------------------------------------------- canonical URLs
@@ -248,6 +289,21 @@ class Page:
     section: str
     fetch: str
     cite: str
+    title: str | None = None   # for pages whose own H1 is generic ("Reference", "MCP server")
+
+
+@dataclass
+class ReleaseNotes:
+    """A repository's GitHub release notes, mirrored into this repository as markdown.
+
+    For casper-node 2.1 and 2.2 these are the ONLY published account of what changed: the docs
+    stop at 2.0, node/CHANGELOG.md stops at 2.1.2, and a GitHub release page is HTML an
+    ingester cannot read. Each note is written to `folder` and cited at its release page."""
+    repo: str
+    section: str
+    since: str            # oldest tag to mirror, e.g. "v2.0.0"
+    folder: str           # where the markdown is written, relative to this repository
+    min_chars: int = 150  # shorter bodies ("Hotfix", links only) are not worth a page
 
 
 @dataclass
@@ -257,12 +313,15 @@ class Index:
     summary: str
     collections: list[Collection] = field(default_factory=list)
     pages: list[Page] = field(default_factory=list)
+    releases: list[ReleaseNotes] = field(default_factory=list)
 
 
-def by_first_dir(strip: str, names: dict[str, str]) -> Callable[[str], str]:
+def by_first_dir(strip: str, names: dict[str, str], root: str = "Overview") -> Callable[[str], str]:
+    """Section named after a page's top-level folder. A file directly under the docs root (index.md,
+    intro.md) goes in `root` - naming a section after it produced headings like "## Index.md"."""
     def section(path: str) -> str:
-        first = path[len(strip):].split("/", 1)[0]
-        return names.get(first, first.replace("-", " ").capitalize())
+        first, sep, _ = path[len(strip):].partition("/")
+        return names.get(first, first.replace("-", " ").capitalize()) if sep else root
     return section
 
 
@@ -279,6 +338,17 @@ def build_indexes() -> list[Index]:
     v2 = released_docs_dir(docs_redux, "main")
     odra_repo = "odradev/odradev.github.io"
     odra_docs = released_docs_dir(odra_repo, "master", "docusaurus/")
+    # Released lines, resolved at generation time so the indexes follow new releases.
+    node_release = latest_release("casper-network/casper-node")
+    launcher_release = latest_release("casper-network/casper-node-launcher")
+    java_release = latest_release("casper-network/casper-java-sdk")
+    net_sdk = "make-software/casper-net-sdk"
+    net_release = latest_release(net_sdk)
+    # casper-net-sdk's master documents KeyPair.Create and the Casper.Network.SDK.CES namespace,
+    # which NuGet 3.2.0 does not ship: a user following them gets a compile error. Until a newer
+    # release exists, KeyManagement comes from the release tag and the CES article is left out.
+    # The other articles newer than the tag describe APIs 3.2.0 already has.
+    net_ahead_of_release = net_release == "v3.2.0"
 
     return [
         Index(
@@ -288,21 +358,30 @@ def build_indexes() -> list[Index]:
                 "The official Casper Network documentation (docs.casper.network), indexed from its source "
                 "repository casper-network/docs-redux: the site publishes no llms.txt and answers every "
                 f"unknown path with its HTML homepage. This is documentation version {version_of(v2)}, the "
-                "one the site serves by default, plus its release notes and FAQ."),
+                "one the site serves by default, plus its release notes and FAQ. The network has moved on "
+                f"since: casper-node's latest release is {node_release}, and what changed after 2.0 is "
+                "covered by the release notes and changelogs in casper-node-tools/llms.txt."),
             collections=[
                 Collection(docs_redux, "main", rf"^{re.escape(v2)}.+\.mdx?$",
                            by_first_dir(v2, {"concepts": "Concepts", "developers": "Developers",
                                              "operators": "Operators", "users": "Users",
                                              "resources": "Resources", "economics": "Economics"}),
                            docusaurus("https://docs.casper.network", casper_sitemap, "/", v2, is_v2_doc)),
-                Collection(docs_redux, "main", r"^condor/[^/]+\.md$", "Casper 2.0 (Condor) release notes",
-                           docusaurus("https://docs.casper.network", casper_sitemap, "/pages/condor", "condor/",
-                                      lambda u: "/pages/condor" in u and "/jsonrpc-comp/" not in u)),
+                # condor/ is its own docs plugin, served at /condor. The /pages/condor URLs are an
+                # OLDER duplicate (src/pages/condor) that the site still renders: citing them sent
+                # readers to text different from what was fetched.
+                Collection(docs_redux, "main", r"^condor/([^/]+|jsonrpc-comp/[^/]+)\.md$", "Casper 2.0 (Condor) release notes",
+                           docusaurus("https://docs.casper.network", casper_sitemap, "/condor", "condor/",
+                                      lambda u: re.match(r"https://docs\.casper\.network/condor(/|$)", u) is not None
+                                      and "/tags" not in u)),
                 Collection(docs_redux, "main", r"^faq/faq\.md$", "FAQ",
                            docusaurus("https://docs.casper.network", casper_sitemap, "/faq", "faq/",
                                       lambda u: "/faq/" in u and "/tags" not in u)),
-                Collection("casper-network/condor-info", "main", r"^(articles|faqs|release-notes)/.+\.md$",
-                           "Casper 2.0 knowledge base (2024)", exclude=r"/jsonrpc-comp/"),
+                # Only the articles with no newer copy in docs-redux: release notes, local setup, the
+                # JSON-RPC comparison, devnet and transactions (002) were all superseded by condor/.
+                Collection("casper-network/condor-info", "main", r"^(articles|faqs)/[^/]+\.md$",
+                           "Casper 2.0 knowledge base (2024)",
+                           exclude=r"^articles/(002|004-local-setup|024-jsonrpc-comp|033-devnet)\.md$"),
             ]),
         Index(
             file="casper-ceps/llms.txt",
@@ -321,17 +400,21 @@ def build_indexes() -> list[Index]:
             summary=(
                 "Reference implementations and guides for Casper's token standards from the "
                 "casper-ecosystem organization: CEP-18 fungible tokens, CEP-78 enhanced NFTs, CEP-85 "
-                "multi-token, and the EIP-712 typed-data toolkit used for off-chain signatures and permits. "
-                "Some tutorials still use casper-client 1.x put-deploy syntax."),
+                "multi-token, the CEP-95 NFT TypeScript client, and the EIP-712 typed-data toolkit used for "
+                "off-chain signatures and permits. Some tutorials still use casper-client 1.x put-deploy syntax."),
             collections=[
                 Collection("casper-ecosystem/cep18", "dev", r"^(README\.md|docs/.+\.md|client-js/README\.md|contracts/contract/README\.md)$",
                            "CEP-18 fungible tokens"),
-                Collection("casper-ecosystem/cep-78-enhanced-nft", "dev", r"^(README\.md|docs/.+\.md|client-js/README\.md|tutorials/.+\.md)$",
+                Collection("casper-ecosystem/cep-78-enhanced-nft", "dev", r"^(README\.md|docs/.+\.md|client-js/README\.md)$",
                            "CEP-78 enhanced NFTs", exclude=r"CHANGELOG"),
-                Collection("casper-ecosystem/cep-85", "dev", r"^(README\.md|TUTORIAL\.md|docs/.+\.md|client-js/README\.md)$",
+                Collection("casper-ecosystem/cep-85", "dev", r"^(README\.md|client-js/TUTORIAL\.md|docs/.+\.md|client-js/README\.md)$",
                            "CEP-85 multi-token", exclude=r"CHANGELOG"),
+                Collection("casper-ecosystem/cep-95-js-client", "main", r"^(README|CHANGELOG)\.md$",
+                           "CEP-95 NFTs (TypeScript client)"),
+                # docs/proposal-casper-native-permits.md is left out: it is a superseded draft whose
+                # API (a 4-argument permit) differs from what shipped.
                 Collection("casper-ecosystem/casper-eip-712", "master",
-                           r"^(README\.md|docs/proposal-casper-native-permits\.md|examples/[^/]+/README\.md|go/README\.md|js/README\.md)$",
+                           r"^(README\.md|examples/[^/]+/README\.md|go/README\.md|js/README\.md)$",
                            "EIP-712 typed data on Casper"),
             ]),
         Index(
@@ -339,36 +422,59 @@ def build_indexes() -> list[Index]:
             title="Casper node, sidecar and command-line client",
             summary=(
                 "Operator and integrator references for the Casper node software: casper-client at v5.0.1 "
-                "(the release CasperAI's commands are pinned to), the casper-sidecar JSON-RPC, SSE and REST "
-                "server, node and execution-engine changelogs, the binary port protocol, and the Casper "
-                "2.0.0 upgrade notes."),
+                "(the release CasperAI's commands are pinned to); casper-node at its latest release "
+                f"({node_release}) with its release notes since 2.0 - the only published account of the 2.1 "
+                "and 2.2 protocol changes - and its changelogs; the casper-node-launcher that delivers "
+                "protocol upgrades; the casper-sidecar JSON-RPC, SSE and REST server; the binary port "
+                "protocol; and the Casper 2.0.0 upgrade notes."),
             collections=[
                 Collection("casper-ecosystem/casper-client-rs", "v5.0.1", r"^(README|CHANGELOG)\.md$", "casper-client (v5.0.1)"),
                 Collection("casper-network/casper-sidecar", "dev",
                            r"^(USAGE\.md|README\.md|CHANGELOG\.md|LEGACY_SSE_EMULATION\.md|rpc_sidecar/README\.md|json_rpc/README\.md)$",
                            "casper-sidecar"),
-                Collection("casper-network/casper-node", "dev",
-                           r"^(node/CHANGELOG\.md|execution_engine/CHANGELOG\.md|types/CHANGELOG\.md|node/BINARY_PORT_PROTOCOL\.md)$",
-                           "casper-node"),
+                # The release TAG: dev carries unreleased changelog entries. storage/CHANGELOG.md is the
+                # only in-repo prose for the 2.2.0 protocol changes (sustain rewards, minimum delegation
+                # rate, total supply recalculation).
+                Collection("casper-network/casper-node", node_release,
+                           r"^(README\.md|node/CHANGELOG\.md|execution_engine/CHANGELOG\.md|types/CHANGELOG\.md"
+                           r"|storage/CHANGELOG\.md|node/BINARY_PORT_PROTOCOL\.md)$",
+                           f"casper-node ({node_release})"),
+                Collection("casper-network/casper-node-launcher", launcher_release,
+                           r"^(README\.md|resources/(ETC_README|VALIDATOR_KEYS_README)\.md"
+                           r"|resources/maintainer_scripts/network_configs/README\.md)$",
+                           f"casper-node-launcher ({launcher_release})"),
                 Collection("casper-network/casper-protocol-release", "casper", r"^(staging_notes\.md|config/CHANGELOG\.md)$",
                            "Casper 2.0.0 upgrade"),
-            ]),
+            ],
+            releases=[ReleaseNotes("casper-network/casper-node", "casper-node release notes", "v2.0.0",
+                                   "casper-node-tools/releases")]),
         Index(
             file="casper-sdks/llms.txt",
             title="Casper SDKs",
             summary=(
-                "Developer documentation for the Casper SDKs: the JavaScript/TypeScript SDK (per page), "
-                "the .NET SDK articles and tutorials, the Go SDK, the Rust/WebAssembly SDK, and the "
+                "Developer documentation for the Casper SDKs: the JavaScript/TypeScript SDK (per page, plus "
+                "its changelog and guides), the .NET SDK articles and tutorials, the Go SDK and its packages, "
+                "the Rust/WebAssembly SDK with its Python bindings and MCP server, the Java SDK, and the "
                 "Casper Wallet SDK for connecting dApps to the Casper Wallet extension."),
             collections=[
+                # dev is right here: the GitHub Pages site is published from it.
                 Collection("casper-ecosystem/casper-js-sdk", "dev", r"^site/pages/.+\.mdx$", "JavaScript / TypeScript SDK",
                            vocs("https://casper-ecosystem.github.io/casper-js-sdk", "site/pages/")),
-                Collection("casper-ecosystem/casper-js-sdk", "dev", r"^resources/migration-guide-v2-v5\.md$",
+                Collection("casper-ecosystem/casper-js-sdk", "dev", r"^(CHANGELOG\.md|resources/.+\.md)$",
                            "JavaScript / TypeScript SDK"),
-                Collection("make-software/casper-net-sdk", "master", r"^(README\.md|CHANGELOG\.md|Docs/Articles/.+\.md|Tutorials/.+/README\.md)$",
-                           ".NET SDK"),
-                Collection("make-software/casper-go-sdk", "master", r"^README\.md$", "Go SDK"),
-                Collection("casper-ecosystem/casper-rust-wasm-sdk", "dev", r"^docs/README\.md$", "Rust / WebAssembly SDK"),
+                Collection(net_sdk, "master", r"^(README\.md|CHANGELOG\.md|Docs/Articles/.+\.md|Docs/Tutorials/.+/README\.md)$",
+                           ".NET SDK",
+                           exclude=r"^Docs/Articles/(KeyManagement|CasperEventStandard)\.md$" if net_ahead_of_release else None),
+                *([Collection(net_sdk, net_release, r"^Docs/Articles/KeyManagement\.md$", ".NET SDK")]
+                  if net_ahead_of_release else []),
+                Collection("make-software/casper-go-sdk", "master",
+                           r"^(README\.md|rpc/README\.md|sse/README(_ADVANCED)?\.md|types/(clvalue|key|keypair)/README\.md)$",
+                           "Go SDK"),
+                Collection("casper-ecosystem/casper-rust-wasm-sdk", "dev",
+                           r"^(docs/README\.md|python/README\.md|mcp/(README|TOOLS)\.md)$", "Rust / WebAssembly SDK"),
+                # The release tag: main still carries the pre-2.0 README; only the release documents
+                # Casper 2.0 support.
+                Collection("casper-network/casper-java-sdk", java_release, r"^README\.md$", f"Java SDK ({java_release})"),
                 Collection("make-software/casper-wallet-sdk", "master", r"^README\.md$", "Casper Wallet SDK"),
             ]),
         Index(
@@ -382,7 +488,8 @@ def build_indexes() -> list[Index]:
                 Collection(odra_repo, "master", rf"^{re.escape(odra_docs)}.+\.mdx?$",
                            by_first_dir(odra_docs, {"basics": "Basics", "advanced": "Advanced",
                                                     "tutorials": "Tutorials", "backends": "Backends",
-                                                    "examples": "Examples", "migrations": "Migrations"}),
+                                                    "examples": "Examples", "migrations": "Migrations"},
+                                        root="Introduction"),
                            docusaurus("https://odra.dev", odra_sitemap, "/docs", odra_docs,
                                       lambda u: "/docs" in u and "/blog/" not in u and not_a_version_path(u))),
             ]),
@@ -390,12 +497,18 @@ def build_indexes() -> list[Index]:
             file="casper-x402/llms.txt",
             title="x402 payments on Casper",
             summary=(
-                "The x402 pay-per-request protocol on Casper: the protocol specification and its Casper "
-                "'exact' scheme from x402-foundation/x402, and the Casper facilitator implementation and "
-                "guides from make-software/casper-x402."),
+                "The x402 pay-per-request protocol on Casper: the protocol specification, its transports "
+                "and its Casper 'exact' scheme from x402-foundation/x402; the hosted CSPR.cloud facilitator "
+                "API (x402-facilitator.cspr.cloud), the production facilitator on Casper; and the Casper "
+                "facilitator implementation and guides from make-software/casper-x402."),
+            pages=[Page("CSPR.cloud x402 facilitator (hosted)",
+                        f"https://docs.cspr.cloud/x402-facilitator-api/{p}.md?displayAgentInstructions=false",
+                        f"https://docs.cspr.cloud/x402-facilitator-api/{p}",
+                        f"CSPR.cloud x402 facilitator API: {p}")
+                   for p in ("reference", "supported", "verify", "settle")],
             collections=[
                 Collection("x402-foundation/x402", "main",
-                           r"^specs/(x402-specification-v2\.md|schemes/exact/scheme_exact(_casper)?\.md|transports-v2/(http|mcp)\.md)$",
+                           r"^specs/(x402-specification-v2\.md|schemes/exact/scheme_exact(_casper)?\.md|transports-v2/[^/]+\.md)$",
                            "x402 specification"),
                 Collection("make-software/casper-x402", "master", r"(^|/)(README\.md|docs/.+\.md)$",
                            "Casper x402 facilitator", exclude=r"(CLAUDE|CHANGELOG)\.md$"),
@@ -405,15 +518,22 @@ def build_indexes() -> list[Index]:
             title="Casper agent skills and MCP servers",
             summary=(
                 "AI-agent tooling for Casper: the CSPR.cloud, CSPR.click and CSPR.trade agent skills from "
-                "MAKE; Odra's Claude Code plugin, whose skills and references cover writing, testing and "
-                "deploying Odra contracts; and casper-mcp, an MCP server with 87 tools for querying and "
-                "building on Casper."),
+                "MAKE; the hosted CSPR.cloud and CSPR.trade MCP servers; Odra's Claude Code plugin, whose "
+                "skills and references cover writing, testing and deploying Odra contracts; and casper-mcp, "
+                "an MCP server with 87 tools for querying and building on Casper."),
             pages=[
                 Page("MAKE agent skills", "https://cspr.build/cspr-cloud/skill.md", "https://cspr.cloud/skill.md"),
+                # Cited on GitHub, where it renders: the docs.cspr.click install page it used to cite shares
+                # none of the skill's text, and its uppercase SKILL.md link now serves an HTML homepage.
                 Page("MAKE agent skills",
                      "https://raw.githubusercontent.com/make-software/csprclick-examples/master/csprclick-skill/SKILL.md",
-                     "https://docs.cspr.click/documentation/ai-agent-skills"),
+                     "https://github.com/make-software/csprclick-examples/blob/master/csprclick-skill/SKILL.md"),
                 Page("MAKE agent skills", "https://mcp.cspr.trade/SKILL.md", "https://mcp.cspr.trade/SKILL.md"),
+                Page("MAKE MCP servers",
+                     "https://docs.cspr.cloud/agentic-tools/mcp-server.md?displayAgentInstructions=false",
+                     "https://docs.cspr.cloud/agentic-tools/mcp-server", "CSPR.cloud MCP server (hosted)"),
+                Page("MAKE MCP servers", "https://mcp.cspr.trade/llms.txt", "https://mcp.cspr.trade/llms.txt",
+                     "CSPR.trade MCP server: tool reference"),
             ],
             collections=[
                 Collection("odradev/odradev-plugins", "main", r"^(README\.md|plugins/odra-plugin/.+\.md)$",
@@ -435,6 +555,9 @@ class Link:
     sort_key: str
 
 
+SELF_REPO, SELF_REF = "msanlisavas/casper-llms", "main"
+
+
 def fetch_markdown(url: str) -> tuple[str | None, str]:
     status, content_type, body = http_get(url)
     if status != 200:
@@ -443,7 +566,43 @@ def fetch_markdown(url: str) -> tuple[str | None, str]:
         return None, f"served as {content_type}"
     if len(body.encode("utf-8")) < MIN_BYTES:
         return None, f"stub ({len(body)} bytes)"
+    # GitBook answers a moved or mistyped .md path with 200 and a markdown "Page Not Found" page.
+    if re.match(r"\A\s*(>.*\n\s*)*#\s+Page Not Found\b", body):
+        return None, "GitBook page-not-found page"
     return body, ""
+
+
+def mirror_release_notes(notes: ReleaseNotes, report: list[str]) -> list["Link"]:
+    """Write each qualifying release's notes to notes.folder and return links to them. The files
+    are committed alongside the index, so their raw URLs exist once the commit is pushed."""
+    status, _, body = http_get(f"https://api.github.com/repos/{notes.repo}/releases?per_page=100", api=True)
+    if status != 200:
+        sys.exit(f"releases of {notes.repo} failed with HTTP {status}")
+    name = notes.repo.split("/", 1)[1]
+    folder = ROOT / notes.folder
+    folder.mkdir(parents=True, exist_ok=True)
+    links, kept = [], set()
+    for release in json.loads(body):
+        # Release bodies come back with CRLF line endings; the repository keeps LF.
+        tag, text = release["tag_name"], (release.get("body") or "").replace("\r\n", "\n").strip()
+        if release["draft"] or release["prerelease"] or version_key(tag) < version_key(notes.since):
+            continue
+        if len(text) < notes.min_chars:
+            report.append(f"  skipped {notes.repo} {tag} release notes: {len(text)} characters")
+            continue
+        file = f"{tag}.md"
+        kept.add(file)
+        (folder / file).write_text(
+            f"# {name} {tag} release notes\n\n"
+            f"Published {release['published_at'][:10]} at {release['html_url']}\n\n{text}\n",
+            encoding="utf-8", newline="\n")
+        links.append(Link(notes.section, f"{name} {tag} release notes",
+                          raw_url(SELF_REPO, SELF_REF, f"{notes.folder}/{file}"), release["html_url"],
+                          ".".join(f"{n:04}" for n in version_key(tag))))
+    for stale in folder.glob("*.md"):    # a release that was deleted or re-tagged upstream
+        if stale.name not in kept:
+            stale.unlink()
+    return links
 
 
 def generate(index: Index, report: list[str]) -> list[Link]:
@@ -476,11 +635,15 @@ def generate(index: Index, report: list[str]) -> list[Link]:
             if body is None:
                 report.append(f"  skipped {page.fetch}: {why}")
                 return None
-            return Link(page.section, title_of(body, page.fetch, frontmatter(body)), page.fetch, page.cite, page.fetch)
+            title = page.title or title_of(body, page.fetch, frontmatter(body))
+            return Link(page.section, title, page.fetch, page.cite, page.fetch)
         jobs.append(("page", page.fetch, job))
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
         links = [link for link in pool.map(lambda j: j[2](), jobs) if link]
+    for notes in index.releases:
+        links += mirror_release_notes(notes, report)
+        sources.append(f"{notes.repo} releases")
 
     # Sections keep the order they are first declared in; links sort by path inside a section.
     order: dict[str, int] = {}

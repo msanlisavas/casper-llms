@@ -14,14 +14,14 @@ fetch, grouped into sections.
 
 | Index | Pages | Covers |
 |---|---|---|
-| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 231 | docs.casper.network (Casper 2.0), the Condor release notes, the FAQ, and the 2024 Casper 2.0 knowledge base |
+| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 222 | docs.casper.network (Casper 2.0), the Condor release notes, the FAQ, and the parts of the 2024 Casper 2.0 knowledge base with no newer copy |
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | Casper Enhancement Proposals, including CEP-18, CEP-78, CEP-2612 and CEP-3009 |
-| [`casper-standards/llms.txt`](casper-standards/llms.txt) | 30 | CEP-18, CEP-78 and CEP-85 reference implementations, and EIP-712 typed data on Casper |
-| [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 14 | casper-client v5.0.1, casper-sidecar, node changelogs and the 2.0.0 upgrade notes |
-| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 175 | The JavaScript/TypeScript SDK page by page, plus the .NET, Go, Rust/WebAssembly and Casper Wallet SDKs |
+| [`casper-standards/llms.txt`](casper-standards/llms.txt) | 32 | CEP-18, CEP-78 and CEP-85 reference implementations, the CEP-95 NFT client, and EIP-712 typed data on Casper |
+| [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 26 | casper-client v5.0.1, casper-node at its latest release with its changelogs and release notes since 2.0, casper-node-launcher, casper-sidecar, and the 2.0.0 upgrade notes |
+| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 189 | The JavaScript/TypeScript SDK page by page, plus the .NET, Go, Rust/WebAssembly, Java and Casper Wallet SDKs |
 | [`odra/llms.txt`](odra/llms.txt) | 53 | The Odra smart-contract framework, released version (odra.dev's own llms.txt links only HTML, and two of its links 404) |
-| [`casper-x402/llms.txt`](casper-x402/llms.txt) | 16 | The x402 specification, its Casper scheme, and the Casper facilitator |
-| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 27 | The CSPR.cloud, CSPR.click and CSPR.trade agent skills, Odra's Claude Code plugin (6 skills and 11 references), and casper-mcp |
+| [`casper-x402/llms.txt`](casper-x402/llms.txt) | 21 | The x402 specification and transports, its Casper scheme, the hosted CSPR.cloud facilitator API, and the Casper facilitator implementation |
+| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 29 | The CSPR.cloud, CSPR.click and CSPR.trade agent skills, the hosted CSPR.cloud and CSPR.trade MCP servers, Odra's Claude Code plugin (6 skills and 11 references), and casper-mcp |
 
 Point a tool at the raw file, e.g.
 `https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt`.
@@ -40,8 +40,16 @@ the second URL is the file on GitHub.
 A published URL is written only when it has been verified: against the site's sitemap for
 docs.casper.network and odra.dev, and by requesting it for the JavaScript SDK site. A plain
 HTTP 200 is never trusted, because docs.casper.network answers every unknown path with 200 and
-its homepage. Two Condor release notes (`devnet-info`, `migration-guide`) exist in the source
-repository but are not published on the site, so they cite GitHub.
+its homepage. The site also still renders an older duplicate of the Condor release notes under
+`/pages/condor`; the indexes cite the current copies under `/condor`, which are the ones fetched.
+
+## Release notes
+
+casper-node's docs stop at 2.0 and its main changelog at 2.1.2, so the GitHub release notes are
+the only published account of the 2.1 and 2.2 protocol changes. A GitHub release page is HTML an
+ingester cannot read, so the generator mirrors each release's notes into
+[`casper-node-tools/releases/`](casper-node-tools/releases) as markdown, cited at the release
+page. Releases whose notes are only a line or two are skipped.
 
 ## Freshness
 
