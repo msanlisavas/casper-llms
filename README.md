@@ -91,7 +91,9 @@ verifier before publication. Each guide names the releases it was verified again
 weekly check flags it when a newer one ships.
 
 <!-- guides:start -->
-No guides yet.
+- [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-10.
+- [What changed in Casper 2.1 and 2.2](guides/casper-2.1-and-2.2.md). Verified against casper-node v2.2.2 on 2026-09-10.
+- [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 on 2026-09-10.
 <!-- guides:end -->
 
 ## Plugins and the casper skill
@@ -128,6 +130,7 @@ fetch, grouped into sections.
 | Index | Pages | Covers |
 |---|---|---|
 | [`casper-docs/llms.txt`](casper-docs/llms.txt) | 221 | The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux |
+| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 3 | Guides written for this repository on what the official Casper documentation does not cover yet |
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | Operator and integrator references for the Casper node software |
 | [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 183 | Developer documentation for the Casper SDKs |
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
