@@ -30,12 +30,28 @@ A capability is listed when it meets every rule:
 2. **Its documentation is readable as text**: `docs.fetch` returns markdown or plain text (a raw
    README, a `.md` page, an llms.txt), not HTML.
 3. **It is never custodial.** A tool that asks users to send a secret key or seed phrase to a
-   remote service is not listed. Signing locally, under the user's control, is fine.
+   remote service is not listed. Signing locally, under the user's control, is fine. A tool
+   whose documented flow keeps keys local but which also exposes a key to others - a tool that
+   takes a key as an MCP tool argument, returns a new key in its reply, or offers an optional
+   key generated on its own server - is listed only with a `caution` that says so.
 4. **Paid capabilities state their pricing** in `pricingNote`.
 5. **It is alive**: a live endpoint, or a commit, release or package publish within the last
    twelve months.
 6. **One entry per capability**, not per marketing page. An MCP server with a mainnet and a
    testnet endpoint is one entry.
+
+Two fields are easy to get wrong:
+
+- **`auth`** is what a user must supply to use it in its default configuration, including an
+  upstream key a self-hosted server needs (for example a CSPR.cloud API key). Use `none` only
+  when it works with no key at all.
+- **`pricing`** is what a user can end up paying to use it as listed, including a service it
+  cannot work without. A free tier plus paid tiers is `free-and-paid`, and charges in testnet
+  tokens count. `paid` means its main function is always charged.
+
+Descriptions, notes and cautions are plain sentences: no HTML, no markdown links, no invisible
+characters. They reach AI agents through the root `llms.txt`, so they must say exactly what a
+reviewer sees in the diff. Install commands pin a released version.
 
 To add or change an entry:
 

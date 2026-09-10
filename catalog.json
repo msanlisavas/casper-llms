@@ -128,7 +128,7 @@
       },
       "source": "https://github.com/mdlog/AgentGate",
       "license": "MIT",
-      "install": "npx -y @mdlog/agentgate mcp"
+      "install": "npx -y @mdlog/agentgate@0.2.1 mcp"
     },
     {
       "id": "agentpay-trust-pass",
@@ -138,7 +138,7 @@
         "name": "Timidan",
         "url": "https://github.com/Timidan"
       },
-      "description": "Stdio MCP server and CLI that check a Casper x402 charge before the buyer signs (PAY, REVIEW or BLOCK), verify the settled transaction against the approved terms, and issue verifiable receipts. Also sells token and account evidence reports over x402. Buyer keys stay local.",
+      "description": "Stdio MCP server and CLI that check a Casper testnet x402 charge before the buyer signs (PAY, REVIEW or BLOCK), verify the settled transaction and issue verifiable receipts; it blocks mainnet charges. Also sells token and account evidence reports over x402. Buyer keys stay local.",
       "url": "https://www.npmjs.com/package/@timidan/agentpay-mcp",
       "hosting": "self-hosted",
       "transport": [
@@ -152,7 +152,6 @@
       "pricing": "free-and-paid",
       "pricingNote": "Quote, payment-status and proof tools are free. Protected tools need a scoped AgentPay token; evidence reports are paid over x402 in testnet WCSPR (0.00001 per report on 2026-09-10).",
       "networks": [
-        "casper:casper",
         "casper:casper-test"
       ],
       "docs": {
@@ -161,7 +160,7 @@
       },
       "source": "https://github.com/Timidan/agentpay-trust-pass",
       "license": "MIT",
-      "install": "npx --yes @timidan/agentpay-mcp"
+      "install": "npx --yes @timidan/agentpay-mcp@0.1.2"
     },
     {
       "id": "casper-mcp-python",
@@ -206,9 +205,10 @@
         "stdio"
       ],
       "auth": [
-        "none"
+        "api-key"
       ],
-      "pricing": "free",
+      "pricing": "free-and-paid",
+      "pricingNote": "The server is free (MIT); it reads chain data through CSPR.cloud with your key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.",
       "networks": [
         "casper:casper",
         "casper:casper-test"
@@ -219,7 +219,7 @@
       },
       "source": "https://github.com/Tairon-ai/casper-network-mcp",
       "license": "MIT",
-      "caution": "Its signing tools accept a PEM key as a tool argument, which puts the key in the model's context; give it the key through the environment instead."
+      "caution": "Its create_wallet tool returns a new private key and its signing tools accept one as an argument, both putting the key in the model's context; use casper-client keygen and an env key."
     },
     {
       "id": "casper-mcp",
@@ -239,7 +239,7 @@
       "auth": [
         "api-key"
       ],
-      "pricing": "free",
+      "pricing": "free-and-paid",
       "pricingNote": "The software is free (MIT). Every call needs a CSPR.cloud API key; CSPR.cloud plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.",
       "networks": [
         "casper:casper",
@@ -251,7 +251,7 @@
       },
       "source": "https://github.com/msanlisavas/casper-mcp",
       "license": "MIT",
-      "install": "docker run -i ghcr.io/msanlisavas/casper-mcp:latest --api-key <CSPR-CLOUD-API-KEY>",
+      "install": "docker run -i ghcr.io/msanlisavas/casper-mcp:3.2.0 --api-key <CSPR-CLOUD-API-KEY>",
       "ours": true
     },
     {
@@ -269,9 +269,10 @@
         "stdio"
       ],
       "auth": [
-        "none"
+        "api-key"
       ],
-      "pricing": "free",
+      "pricing": "free-and-paid",
+      "pricingNote": "The server is free; every tool calls CSPR.cloud with your key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.",
       "networks": [
         "casper:casper",
         "casper:casper-test"
@@ -311,7 +312,7 @@
       },
       "source": "https://github.com/casper-ecosystem/casper-rust-wasm-sdk",
       "license": "Apache-2.0",
-      "caution": "Its sign and submit tools take a secret key PEM as a tool argument, which puts the key in the model's context; use the read and unsigned-builder tools, or sign elsewhere."
+      "caution": "Its keygen, sign and submit tools pass a secret key PEM through the model's context, and on the hosted webclient endpoint through a third-party server; use only its read and unsigned-builder tools."
     },
     {
       "id": "casperai-mcp",
@@ -359,9 +360,10 @@
         "stdio"
       ],
       "auth": [
-        "none"
+        "api-key"
       ],
-      "pricing": "free",
+      "pricing": "free-and-paid",
+      "pricingNote": "The server is free; its reads need a CSPR.cloud key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.",
       "networks": [
         "casper:casper",
         "casper:casper-test"
@@ -371,7 +373,8 @@
         "cite": "https://github.com/emmgr23/CasperFlow/tree/main/mcp-server"
       },
       "source": "https://github.com/emmgr23/CasperFlow",
-      "install": "npx -y casperflow-mcp"
+      "install": "npx -y casperflow-mcp@0.1.0",
+      "caution": "Its send, delegate and attest tools sign and submit real transactions with no spending limit; its publisher says to use only a dedicated testnet key, never one holding mainnet funds."
     },
     {
       "id": "ceps-rust-ts-client-mcp",
@@ -402,7 +405,6 @@
       },
       "source": "https://github.com/Interchouette-ITC/ceps-rust-ts-client",
       "license": "GPL-3.0",
-      "install": "docker pull interchouette/ceps-rust-ts-client-mcp:dev",
       "caution": "Its write tools can sign in-process with a PEM passed as a tool argument, which puts the key in the model's context; use the unsigned-transaction mode instead."
     },
     {
@@ -421,7 +423,8 @@
         "streamable-http"
       ],
       "auth": [
-        "none"
+        "none",
+        "api-key"
       ],
       "pricing": "free",
       "networks": [
@@ -521,7 +524,7 @@
       },
       "source": "https://github.com/Micoh18/Mr-Mainspring",
       "license": "MIT",
-      "install": "npx -y mrmainspring setup"
+      "install": "npx -y mrmainspring@0.3.11 setup"
     },
     {
       "id": "sluice-casper-events",
@@ -586,7 +589,7 @@
       },
       "description": "Agent skill for integrating the CSPR.click Web SDK into Casper dApps: wallet connection, transaction and message signing through the user's wallet, events, theming and CSPR.cloud proxies, for React, Next.js and vanilla JS.",
       "url": "https://raw.githubusercontent.com/make-software/csprclick-examples/master/csprclick-skill/SKILL.md",
-      "pricing": "free",
+      "pricing": "free-and-paid",
       "pricingNote": "The skill is free. Production CSPR.click apps need an appId from console.cspr.build; CSPR.click plans are Free up to 1,000 monthly active wallets, Pro $99/mo, Custom.",
       "networks": [
         "casper:casper",
@@ -610,7 +613,7 @@
       },
       "description": "Agent skill (SKILL.md) that teaches coding agents CSPR.cloud REST, Streaming and Casper Node proxy conventions (auth, pagination, includes, errors) and points them to the relevant docs pages instead of copying the API reference.",
       "url": "https://cspr.cloud/skill.md",
-      "pricing": "free",
+      "pricing": "free-and-paid",
       "pricingNote": "The skill is free. The APIs it targets need a CSPR.cloud access token: Free $0/mo, Pro $199/mo, Custom (https://cspr.build/pricing/).",
       "networks": [
         "casper:casper",
@@ -707,7 +710,8 @@
         "cite": "https://github.com/xinminsu/plugin-casper"
       },
       "source": "https://github.com/xinminsu/plugin-casper",
-      "license": "MIT"
+      "license": "MIT",
+      "caution": "Its GENERATE_CASPER_WALLET action posts the new private key in the chat reply, where the channel, the agent's memory and the model all see it; create keys with casper-client keygen."
     },
     {
       "id": "hermes-plugin-casper",
@@ -717,7 +721,7 @@
         "name": "xinminsu",
         "url": "https://github.com/xinminsu"
       },
-      "description": "Hermes Agent plugin for Casper with 16 tools: network, account, token, staking and DApp reads over JSON-RPC, local alerts, wallet generation, and CSPR, token, NFT, staking and DeFi writes signed locally by a bundled casper-js-sdk runner; testnet by default, mainnet via env.",
+      "description": "Hermes Agent plugin for Casper with 16 tools: network, account, token, staking and DApp reads over JSON-RPC, local alerts, and CSPR, token, NFT, staking and DeFi writes signed locally by a bundled casper-js-sdk runner; testnet by default, mainnet via env.",
       "url": "https://github.com/xinminsu/plugin-casper-hermes",
       "pricing": "free",
       "networks": [
@@ -793,7 +797,8 @@
       "pricing": "paid",
       "pricingNote": "Charged per delivered answer from a prepaid API key, or by x402 on Casper mainnet; refusals are never charged.",
       "networks": [
-        "casper:casper"
+        "casper:casper",
+        "casper:casper-test"
       ],
       "docs": {
         "fetch": "https://casperai.ekolsoft.com/llms.txt",
@@ -1022,7 +1027,7 @@
       },
       "description": ".NET Standard 2.0/2.1 client library for the CSPR.cloud REST and Streaming APIs on Casper mainnet and testnet; since v4.2.0 it also wraps the CSPR.cloud x402 facilitator (supported, verify, settle). Ships an llms.txt usage guide for coding agents.",
       "url": "https://www.nuget.org/packages/CSPR.Cloud.Net",
-      "pricing": "free",
+      "pricing": "free-and-paid",
       "pricingNote": "The library is free (MIT). It calls CSPR.cloud, which needs an access token; plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.",
       "networks": [
         "casper:casper",

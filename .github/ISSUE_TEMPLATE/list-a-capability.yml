@@ -51,7 +51,7 @@ body:
     id: access
     attributes:
       label: Authentication, pricing and networks
-      description: How clients authenticate (none, API key, x402, OAuth), what it costs, and whether it works on mainnet, testnet or both.
+      description: What a user must supply to use it, including an upstream key it needs (none, API key, x402, OAuth); what a user can end up paying, including a service it cannot work without and testnet-token charges; and whether it works on mainnet, testnet or both.
     validations:
       required: true
   - type: input

@@ -11,7 +11,11 @@
     "capabilities": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/capability" } }
   },
   "$defs": {
-    "url": { "type": "string", "pattern": "^https://[^\\s/]+[^\\s]*$" },
+    "url": {
+      "description": "https, a plain host (no user@ part, which would send the request to a different host than it appears to), then an optional path.",
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(:[0-9]+)?(/\\S*)?$"
+    },
     "label": { "type": "string", "minLength": 2, "maxLength": 80, "pattern": "^[^\\[\\]|\\n]+$" },
     "sentence": { "type": "string", "pattern": "^[^\\n|]+$" },
     "capability": {
@@ -51,8 +55,14 @@
           "enum": ["hosted", "self-hosted"]
         },
         "transport": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["streamable-http", "stdio", "sse"] } },
-        "auth": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["none", "api-key", "x402", "oauth"] } },
-        "pricing": { "enum": ["free", "paid", "free-and-paid"] },
+        "auth": {
+          "description": "What a user must supply to use it in its default configuration, including an upstream key a self-hosted server needs (for example a CSPR.cloud API key). none only when it works with no key at all.",
+          "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["none", "api-key", "x402", "oauth"] }
+        },
+        "pricing": {
+          "description": "What a user can end up paying to use it as listed, including a service it cannot work without. A free tier plus paid tiers is free-and-paid, and charges in testnet tokens count. paid means its main function is always charged.",
+          "enum": ["free", "paid", "free-and-paid"]
+        },
         "pricingNote": { "allOf": [{ "$ref": "#/$defs/sentence" }, { "type": "string", "minLength": 5, "maxLength": 200 }] },
         "networks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["casper:casper", "casper:casper-test"] } },
         "source": { "$ref": "#/$defs/url" },

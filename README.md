@@ -2,7 +2,6 @@
 
 [![validate](https://github.com/msanlisavas/casper-llms/actions/workflows/validate.yml/badge.svg)](https://github.com/msanlisavas/casper-llms/actions/workflows/validate.yml)
 [![regenerate](https://github.com/msanlisavas/casper-llms/actions/workflows/regenerate.yml/badge.svg)](https://github.com/msanlisavas/casper-llms/actions/workflows/regenerate.yml)
-[![check](https://github.com/msanlisavas/casper-llms/actions/workflows/check.yml/badge.svg)](https://github.com/msanlisavas/casper-llms/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 The home for AI capabilities on the Casper Network:
@@ -26,8 +25,9 @@ the colon is where a person reads it.
 
 Every capability with its endpoint, authentication, pricing and networks is in
 [directory.md](directory.md), generated from [catalog.json](catalog.json). A
-[weekly check](.github/workflows/check.yml) confirms that each one still answers, and opens an
-issue when one does not. Listing is not an endorsement or a security audit: many entries are
+[weekly check](.github/workflows/check.yml) confirms that each one still answers, and keeps one
+[tracking issue](https://github.com/msanlisavas/casper-llms/issues?q=is%3Aissue+label%3Aweekly-check)
+open while any does not. Listing is not an endorsement or a security audit: many entries are
 early projects that run only on testnet, and some carry a caution worth reading first. To list
 yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 
@@ -43,21 +43,21 @@ yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 | [AgentGate](directory.md#agentgate) | MCP server | mdlog | no key; free |
 | [AgentPay (Casper x402 charge checker)](directory.md#agentpay-casper-x402-charge-checker) | MCP server | Timidan | no key, API key, x402 per call; free and paid |
 | [Casper MCP Python Server](directory.md#casper-mcp-python-server) | MCP server | Jiu-hong | no key; free |
-| [Casper Network MCP Server (Tairon.ai)](directory.md#casper-network-mcp-server-taironai) | MCP server | Tairon.ai | no key; free |
-| [casper-mcp](directory.md#casper-mcp) | MCP server | msanlisavas | API key; free |
-| [casper-mcp-py](directory.md#casper-mcp-py) | MCP server | Tmalone1250 | no key; free |
+| [Casper Network MCP Server (Tairon.ai)](directory.md#casper-network-mcp-server-taironai) | MCP server | Tairon.ai | API key; free and paid |
+| [casper-mcp](directory.md#casper-mcp) | MCP server | msanlisavas | API key; free and paid |
+| [casper-mcp-py](directory.md#casper-mcp-py) | MCP server | Tmalone1250 | API key; free and paid |
 | [casper-rust-wasm-sdk MCP server](directory.md#casper-rust-wasm-sdk-mcp-server) | MCP server | Interchouette - ITC | no key; free |
 | [CasperAI MCP server](directory.md#casperai-mcp-server) | MCP server | msanlisavas | no key, API key, x402 per call; free and paid |
-| [CasperFlow MCP server](directory.md#casperflow-mcp-server) | MCP server | emmgr23 | no key; free |
+| [CasperFlow MCP server](directory.md#casperflow-mcp-server) | MCP server | emmgr23 | API key; free and paid |
 | [ceps-rust-ts-client MCP server](directory.md#ceps-rust-ts-client-mcp-server) | MCP server | Interchouette ITC | no key; free |
-| [CSPR.AI MCP server](directory.md#csprai-mcp-server) | MCP server | Blockchain-Oracle | no key; free |
+| [CSPR.AI MCP server](directory.md#csprai-mcp-server) | MCP server | Blockchain-Oracle | no key, API key; free |
 | [CSPR.cloud MCP server](directory.md#csprcloud-mcp-server) | MCP server | MAKE Software | API key; free and paid |
 | [CSPR.trade MCP server](directory.md#csprtrade-mcp-server) | MCP server | MAKE Software | no key; free |
 | [Mr Mainspring](directory.md#mr-mainspring) | MCP server | Micoh18 | no key; free |
 | [Sluice](directory.md#sluice) | MCP server | Unity Nodes | no key; free and paid |
 | [Casper testnet deploy skill (casper-js-sdk)](directory.md#casper-testnet-deploy-skill-casper-js-sdk) | Agent skill | TerexitariusStomp | Free |
-| [CSPR.click SDK integration skill](directory.md#csprclick-sdk-integration-skill) | Agent skill | MAKE Software | Free |
-| [CSPR.cloud AI skill](directory.md#csprcloud-ai-skill) | Agent skill | MAKE Software | Free |
+| [CSPR.click SDK integration skill](directory.md#csprclick-sdk-integration-skill) | Agent skill | MAKE Software | Free and paid |
+| [CSPR.cloud AI skill](directory.md#csprcloud-ai-skill) | Agent skill | MAKE Software | Free and paid |
 | [CSPR.trade DEX assistant skill](directory.md#csprtrade-dex-assistant-skill) | Agent skill | MAKE Software | Free |
 | [Fund402 agent skills](directory.md#fund402-agent-skills) | Agent skill | nickthelegend | Free and paid |
 | [Odra Casper testnet deploy skill](directory.md#odra-casper-testnet-deploy-skill) | Agent skill | t9fiction | Free |
@@ -75,7 +75,7 @@ yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 | [casper-trust](directory.md#casper-trust) | SDK | Bekirerdem | Free |
 | [casper-webrtc-stream x402 SDK](directory.md#casper-webrtc-stream-x402-sdk) | SDK | nickthelegend | Free |
 | [castAI](directory.md#castai) | SDK | fozagtx | Free |
-| [CSPR.Cloud.Net](directory.md#csprcloudnet) | SDK | msanlisavas | Free |
+| [CSPR.Cloud.Net](directory.md#csprcloudnet) | SDK | msanlisavas | Free and paid |
 | [Fund402 SDK](directory.md#fund402-sdk) | SDK | nickthelegend | Free and paid |
 | [r402-casper (Rust)](directory.md#r402-casper-rust) | SDK | qntx | Free |
 | [x402-casper](directory.md#x402-casper) | SDK | rajkaria | Free |
@@ -109,7 +109,11 @@ No guides yet.
 | `casperai` | CasperAI's MCP server: cited answers (paid per call) and casper-client command building (free) | `CASPERAI_API_KEY` |
 | `odra-plugin` | Odra's own plugin for writing, testing and deploying Odra contracts, installed from its repository | Nothing |
 
-Keys are read from your environment and never stored in this repository. The skill in
+Keys are read from your environment and never stored in this repository: each server may read
+only its own key variable, and `validate.py` refuses anything else. Odra's plugin is installed from
+its own repository at a pinned commit, moved only after its changes are reviewed; because its
+version number decides updates, existing installs pick up a new pin only when Odra bumps it.
+The skill in
 [`plugins/casper/skills/casper`](plugins/casper/skills/casper/SKILL.md) uses the open
 [Agent Skills](https://agentskills.io) format, so any agent that reads `SKILL.md` can use it.
 

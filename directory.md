@@ -90,22 +90,22 @@ CLI and stdio MCP server for x402 paid APIs on Casper testnet: discover services
 - **Publisher:** [mdlog](https://github.com/mdlog)
 - **Documentation:** https://github.com/mdlog/AgentGate
 - **Source:** https://github.com/mdlog/AgentGate (MIT)
-- **Install:** `npx -y @mdlog/agentgate mcp`
+- **Install:** `npx -y @mdlog/agentgate@0.2.1 mcp`
 
 ### AgentPay (Casper x402 charge checker)
 
-Stdio MCP server and CLI that check a Casper x402 charge before the buyer signs (PAY, REVIEW or BLOCK), verify the settled transaction against the approved terms, and issue verifiable receipts. Also sells token and account evidence reports over x402. Buyer keys stay local.
+Stdio MCP server and CLI that check a Casper testnet x402 charge before the buyer signs (PAY, REVIEW or BLOCK), verify the settled transaction and issue verifiable receipts; it blocks mainnet charges. Also sells token and account evidence reports over x402. Buyer keys stay local.
 
 - **URL:** https://www.npmjs.com/package/@timidan/agentpay-mcp
 - **Hosting:** Self-hosted
 - **Transport:** stdio
 - **Authentication:** no key, API key, x402 per call
 - **Pricing:** Free and paid - Quote, payment-status and proof tools are free. Protected tools need a scoped AgentPay token; evidence reports are paid over x402 in testnet WCSPR (0.00001 per report on 2026-09-10).
-- **Networks:** mainnet, testnet
+- **Networks:** testnet
 - **Publisher:** [Timidan](https://github.com/Timidan)
 - **Documentation:** https://github.com/Timidan/agentpay-trust-pass
 - **Source:** https://github.com/Timidan/agentpay-trust-pass (MIT)
-- **Install:** `npx --yes @timidan/agentpay-mcp`
+- **Install:** `npx --yes @timidan/agentpay-mcp@0.1.2`
 
 ### Casper MCP Python Server
 
@@ -125,13 +125,13 @@ Python stdio MCP server for Casper aimed at GitHub Copilot Chat: node, block, er
 
 Node.js stdio MCP server for Casper with 8 tools: wallet creation, balance, account, staking and validator queries, CSPR transfers, delegation and undelegation. Signs locally with a PEM key from env or passed as a tool argument; defaults to mainnet via CSPR.cloud RPC (API key needed).
 
-**Caution:** Its signing tools accept a PEM key as a tool argument, which puts the key in the model's context; give it the key through the environment instead.
+**Caution:** Its create_wallet tool returns a new private key and its signing tools accept one as an argument, both putting the key in the model's context; use casper-client keygen and an env key.
 
 - **URL:** https://github.com/Tairon-ai/casper-network-mcp
 - **Hosting:** Self-hosted
 - **Transport:** stdio
-- **Authentication:** no key
-- **Pricing:** Free
+- **Authentication:** API key
+- **Pricing:** Free and paid - The server is free (MIT); it reads chain data through CSPR.cloud with your key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [Tairon.ai](https://github.com/Tairon-ai)
 - **Documentation:** https://github.com/Tairon-ai/casper-network-mcp
@@ -145,12 +145,12 @@ Open-source .NET 10 MCP server with 82 Casper Network tools backed by the CSPR.c
 - **Hosting:** Self-hosted
 - **Transport:** stdio, Streamable HTTP
 - **Authentication:** API key
-- **Pricing:** Free - The software is free (MIT). Every call needs a CSPR.cloud API key; CSPR.cloud plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.
+- **Pricing:** Free and paid - The software is free (MIT). Every call needs a CSPR.cloud API key; CSPR.cloud plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [msanlisavas](https://github.com/msanlisavas) (maintained here)
 - **Documentation:** https://github.com/msanlisavas/casper-mcp
 - **Source:** https://github.com/msanlisavas/casper-mcp (MIT)
-- **Install:** `docker run -i ghcr.io/msanlisavas/casper-mcp:latest --api-key <CSPR-CLOUD-API-KEY>`
+- **Install:** `docker run -i ghcr.io/msanlisavas/casper-mcp:3.2.0 --api-key <CSPR-CLOUD-API-KEY>`
 
 ### casper-mcp-py
 
@@ -159,8 +159,8 @@ Python port of casper-mcp: a stdio MCP server with 80+ query tools over the CSPR
 - **URL:** https://github.com/Tmalone1250/casper-mcp-py
 - **Hosting:** Self-hosted
 - **Transport:** stdio
-- **Authentication:** no key
-- **Pricing:** Free
+- **Authentication:** API key
+- **Pricing:** Free and paid - The server is free; every tool calls CSPR.cloud with your key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [Tmalone1250](https://github.com/Tmalone1250)
 - **Documentation:** https://github.com/Tmalone1250/casper-mcp-py
@@ -170,7 +170,7 @@ Python port of casper-mcp: a stdio MCP server with 80+ query tools over the CSPR
 
 Rust MCP server over casper-rust-wasm-sdk: node JSON-RPC and binary-port reads, transaction/deploy builders, speculative execution, contract queries and SSE tools, plus sign/submit tools that take a secret key PEM as a tool argument and sign in the self-hosted process. stdio or Streamable HTTP.
 
-**Caution:** Its sign and submit tools take a secret key PEM as a tool argument, which puts the key in the model's context; use the read and unsigned-builder tools, or sign elsewhere.
+**Caution:** Its keygen, sign and submit tools pass a secret key PEM through the model's context, and on the hosted webclient endpoint through a third-party server; use only its read and unsigned-builder tools.
 
 - **URL:** https://hub.docker.com/r/interchouette/casper-rust-wasm-sdk-mcp
 - **Hosting:** Self-hosted
@@ -199,16 +199,18 @@ Hosted MCP server with two tools: casper_ask returns a verified, cited answer ab
 
 npm stdio MCP server from the CasperFlow agent builder: account info, CSPR balances, CSPR.name resolution, native CSPR transfers, delegation, and EIP-712 attestations anchored by a self-transfer. Signs locally with a hex secret key from env; testnet by default, mainnet optional.
 
+**Caution:** Its send, delegate and attest tools sign and submit real transactions with no spending limit; its publisher says to use only a dedicated testnet key, never one holding mainnet funds.
+
 - **URL:** https://www.npmjs.com/package/casperflow-mcp
 - **Hosting:** Self-hosted
 - **Transport:** stdio
-- **Authentication:** no key
-- **Pricing:** Free
+- **Authentication:** API key
+- **Pricing:** Free and paid - The server is free; its reads need a CSPR.cloud key. CSPR.cloud plans (cspr.build/pricing): Free $0/mo, Pro $199/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [emmgr23](https://github.com/emmgr23)
 - **Documentation:** https://github.com/emmgr23/CasperFlow/tree/main/mcp-server
 - **Source:** https://github.com/emmgr23/CasperFlow
-- **Install:** `npx -y casperflow-mcp`
+- **Install:** `npx -y casperflow-mcp@0.1.0`
 
 ### ceps-rust-ts-client MCP server
 
@@ -225,7 +227,6 @@ Self-hosted Rust MCP server (128 tools, stdio or Streamable HTTP) to install, qu
 - **Publisher:** [Interchouette ITC](https://github.com/Interchouette-ITC)
 - **Documentation:** https://github.com/Interchouette-ITC/ceps-rust-ts-client/tree/dev/mcp
 - **Source:** https://github.com/Interchouette-ITC/ceps-rust-ts-client (GPL-3.0)
-- **Install:** `docker pull interchouette/ceps-rust-ts-client-mcp:dev`
 
 ### CSPR.AI MCP server
 
@@ -234,7 +235,7 @@ Self-hosted TypeScript MCP server (33 tools, stdio or Streamable HTTP) for Caspe
 - **URL:** https://github.com/Blockchain-Oracle/cspr-ai
 - **Hosting:** Self-hosted
 - **Transport:** stdio, Streamable HTTP
-- **Authentication:** no key
+- **Authentication:** no key, API key
 - **Pricing:** Free
 - **Networks:** mainnet, testnet
 - **Publisher:** [Blockchain-Oracle](https://github.com/Blockchain-Oracle)
@@ -282,7 +283,7 @@ Stdio MCP server that gives agents hashed, verifiable memory, an encrypted local
 - **Publisher:** [Micoh18](https://github.com/Micoh18)
 - **Documentation:** https://github.com/Micoh18/Mr-Mainspring
 - **Source:** https://github.com/Micoh18/Mr-Mainspring (MIT)
-- **Install:** `npx -y mrmainspring setup`
+- **Install:** `npx -y mrmainspring@0.3.11 setup`
 
 ### Sluice
 
@@ -318,7 +319,7 @@ Agent skill for deploying Rust smart contracts to Casper testnet (protocol 2.0+)
 Agent skill for integrating the CSPR.click Web SDK into Casper dApps: wallet connection, transaction and message signing through the user's wallet, events, theming and CSPR.cloud proxies, for React, Next.js and vanilla JS.
 
 - **URL:** https://raw.githubusercontent.com/make-software/csprclick-examples/master/csprclick-skill/SKILL.md
-- **Pricing:** Free - The skill is free. Production CSPR.click apps need an appId from console.cspr.build; CSPR.click plans are Free up to 1,000 monthly active wallets, Pro $99/mo, Custom.
+- **Pricing:** Free and paid - The skill is free. Production CSPR.click apps need an appId from console.cspr.build; CSPR.click plans are Free up to 1,000 monthly active wallets, Pro $99/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [MAKE Software](https://makegroup.io)
 - **Documentation:** https://docs.cspr.click/documentation/ai-agent-skills
@@ -330,7 +331,7 @@ Agent skill for integrating the CSPR.click Web SDK into Casper dApps: wallet con
 Agent skill (SKILL.md) that teaches coding agents CSPR.cloud REST, Streaming and Casper Node proxy conventions (auth, pagination, includes, errors) and points them to the relevant docs pages instead of copying the API reference.
 
 - **URL:** https://cspr.cloud/skill.md
-- **Pricing:** Free - The skill is free. The APIs it targets need a CSPR.cloud access token: Free $0/mo, Pro $199/mo, Custom (https://cspr.build/pricing/).
+- **Pricing:** Free and paid - The skill is free. The APIs it targets need a CSPR.cloud access token: Free $0/mo, Pro $199/mo, Custom (https://cspr.build/pricing/).
 - **Networks:** mainnet, testnet
 - **Publisher:** [MAKE Software](https://makegroup.io)
 - **Documentation:** https://docs.cspr.cloud/agentic-tools/ai-skill
@@ -376,6 +377,8 @@ Agent skill for deploying Odra contracts to Casper testnet with casper-client: c
 
 ElizaOS plugin for Casper with 14 actions: wallet generation, CSPR balance and transfers, network, account, contract, dictionary, CEP-18/47/78 token and staking queries and writes, signed locally with a key from agent settings; testnet by default, mainnet by config.
 
+**Caution:** Its GENERATE_CASPER_WALLET action posts the new private key in the chat reply, where the channel, the agent's memory and the model all see it; create keys with casper-client keygen.
+
 - **URL:** https://www.npmjs.com/package/@suxinmin/plugin-casper
 - **Pricing:** Free
 - **Networks:** mainnet, testnet
@@ -385,7 +388,7 @@ ElizaOS plugin for Casper with 14 actions: wallet generation, CSPR balance and t
 
 ### Casper plugin for Hermes Agent
 
-Hermes Agent plugin for Casper with 16 tools: network, account, token, staking and DApp reads over JSON-RPC, local alerts, wallet generation, and CSPR, token, NFT, staking and DeFi writes signed locally by a bundled casper-js-sdk runner; testnet by default, mainnet via env.
+Hermes Agent plugin for Casper with 16 tools: network, account, token, staking and DApp reads over JSON-RPC, local alerts, and CSPR, token, NFT, staking and DeFi writes signed locally by a bundled casper-js-sdk runner; testnet by default, mainnet via env.
 
 - **URL:** https://github.com/xinminsu/plugin-casper-hermes
 - **Pricing:** Free
@@ -426,7 +429,7 @@ HTTP API that streams a verified, cited answer about the Casper Network as Serve
 - **Endpoint:** https://casperai.ekolsoft.com/v1/chat
 - **Authentication:** API key, x402 per call
 - **Pricing:** Paid - Charged per delivered answer from a prepaid API key, or by x402 on Casper mainnet; refusals are never charged.
-- **Networks:** mainnet
+- **Networks:** mainnet, testnet
 - **Publisher:** [msanlisavas](https://github.com/msanlisavas) (maintained here)
 - **Documentation:** https://casperai.ekolsoft.com
 
@@ -547,7 +550,7 @@ TypeScript kit for paid HTTP on Casper: x402 and MPP payments as native CSPR tra
 .NET Standard 2.0/2.1 client library for the CSPR.cloud REST and Streaming APIs on Casper mainnet and testnet; since v4.2.0 it also wraps the CSPR.cloud x402 facilitator (supported, verify, settle). Ships an llms.txt usage guide for coding agents.
 
 - **URL:** https://www.nuget.org/packages/CSPR.Cloud.Net
-- **Pricing:** Free - The library is free (MIT). It calls CSPR.cloud, which needs an access token; plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.
+- **Pricing:** Free and paid - The library is free (MIT). It calls CSPR.cloud, which needs an access token; plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.
 - **Networks:** mainnet, testnet
 - **Publisher:** [msanlisavas](https://github.com/msanlisavas) (maintained here)
 - **Documentation:** https://github.com/msanlisavas/CSPR.Cloud.Net
