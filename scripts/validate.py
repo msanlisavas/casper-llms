@@ -18,8 +18,10 @@ It also checks what is written by hand or rendered from it:
   "Verified against ..." line;
 - the root llms.txt, directory.md, the README blocks and casper-guides/llms.txt must match what
   catalog.json, guides/ and the indexes render - a hand edit to any of them is overwritten;
-- the plugin marketplace must be well formed, and no plugin may carry a credential: MCP headers
-  take their values only from environment variables.
+- the plugin marketplace must be well formed, and nothing a plugin ships can run a command or leak
+  a credential: only remote MCP servers on reviewed hosts, each header reading only that host's
+  key variable, no credentials or ${...} in URLs, no hooks or commands, a token scan over every
+  shipped file, and plugins from other repositories pinned to a reviewed commit.
 
 Usage:  python scripts/validate.py        exit status 1 if anything breaks a rule.
 """
@@ -28,6 +30,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import urllib.parse
 from pathlib import Path
 
 import catalog
@@ -91,14 +94,31 @@ def check_text(text: str, name: str) -> list[str]:
 
 
 KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-# A header value must name an environment variable, never carry the credential itself.
-ENV_HEADER = re.compile(r"^(Bearer )?\$\{[A-Z][A-Z0-9_]*\}$")
+SHA = re.compile(r"^[0-9a-f]{40}$")
+# A header value names an environment variable; it never carries the credential itself.
+ENV_HEADER = re.compile(r"^(?:Bearer )?\$\{([A-Z][A-Z0-9_]*)\}$")
+# Every host a plugin here may connect to, and the only variables its headers may read. Claude
+# Code expands ${VAR} from the user's WHOLE environment, so an unlisted variable such as
+# ${GITHUB_TOKEN} would be sent to the host. Adding a host is a reviewed change to this table.
+HEADER_VARIABLES = {
+    "mcp.cspr.trade": set(),
+    "mcp.cspr.cloud": {"CSPR_CLOUD_API_KEY"},
+    "mcp.testnet.cspr.cloud": {"CSPR_CLOUD_API_KEY"},
+    "casperai.ekolsoft.com": {"CASPERAI_API_KEY"},
+}
+MARKETPLACE_KEYS = {"name", "owner", "metadata", "plugins"}
+ENTRY_KEYS = {"name", "source", "description", "category", "tags", "version", "author", "homepage",
+              "repository", "license", "keywords"}
+MANIFEST_KEYS = {"name", "description", "version", "author", "homepage", "repository", "license", "keywords"}
+SERVER_KEYS = {"type", "url", "headers"}
+TOKEN = re.compile(r"cai_[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}"
+                   r"|xox[abprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----")
 
 
 def read_json(path: Path, errors: list[str], name: str):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         errors.append(f"{name}: not readable JSON ({error})")
         return None
 
@@ -113,14 +133,66 @@ def skill_frontmatter(text: str) -> dict[str, str]:
     return fields
 
 
+def check_mcp_servers(servers, where: str) -> list[str]:
+    """Remote servers only, on a reviewed host, reading only that host's key from the environment."""
+    if not isinstance(servers, dict) or not servers:
+        return [f"{where}: needs a non-empty mcpServers object"]
+    errors = []
+    for name, server in servers.items():
+        at = f"{where} {name}"
+        if not isinstance(server, dict):
+            errors.append(f"{at}: must be an object")
+            continue
+        extra = sorted(set(server) - SERVER_KEYS)
+        if extra:    # command/args/env (a local process), headersHelper (runs a command), ...
+            errors.append(f"{at}: only type, url and headers are allowed here, not {', '.join(extra)}")
+        if server.get("type") != "http":
+            errors.append(f"{at}: only remote servers (type http) are shipped here")
+        url = urllib.parse.urlsplit(str(server.get("url", "")))
+        if url.scheme != "https" or url.username or url.password or url.query or url.fragment or "${" in url.geturl():
+            errors.append(f"{at}: url must be a plain https URL with no credentials, query, fragment or ${{...}}")
+        host = (url.hostname or "").lower()
+        if host not in HEADER_VARIABLES:
+            errors.append(f"{at}: {host or 'the url'} is not a reviewed host (add it to HEADER_VARIABLES in validate.py)")
+        headers = server.get("headers") or {}
+        if not isinstance(headers, dict):
+            errors.append(f"{at}: headers must be an object")
+            continue
+        for header, value in headers.items():
+            match = ENV_HEADER.match(str(value))
+            if not match:
+                errors.append(f"{at}: header {header} must come from an environment variable "
+                              "(\"${NAME}\" or \"Bearer ${NAME}\"), never a literal value")
+            elif match[1] not in HEADER_VARIABLES.get(host, set()):
+                errors.append(f"{at}: header {header} may not read ${{{match[1]}}}; {host} may read only "
+                              f"{', '.join(sorted(HEADER_VARIABLES.get(host, set()))) or 'no variable'}")
+    return errors
+
+
 def check_plugin_folder(folder: Path, name: str, root: Path) -> list[str]:
     rel = folder.relative_to(root).as_posix()
     errors: list[str] = []
+    # Only a manifest, an MCP config and skills: hooks, commands, agents, LSP servers and scripts run
+    # code on the user's machine and would need their own review rules before shipping here.
+    for file in sorted(p for p in folder.rglob("*") if p.is_file()):
+        inside = file.relative_to(folder).as_posix()
+        if inside not in (".claude-plugin/plugin.json", ".mcp.json") and not (
+                inside.startswith("skills/") and file.suffix == ".md"):
+            errors.append(f"{rel}/{inside}: only .claude-plugin/plugin.json, .mcp.json and skills/**/*.md may ship")
+        text = file.read_text(encoding="utf-8", errors="replace")
+        if TOKEN.search(text):
+            errors.append(f"{rel}/{inside}: contains what looks like a credential")
     manifest = folder / ".claude-plugin" / "plugin.json"
     if manifest.exists():
         data = read_json(manifest, errors, f"{rel}/.claude-plugin/plugin.json")
-        if data is not None and data.get("name") != name:
-            errors.append(f"{rel}: plugin.json name {data.get('name')!r} differs from the marketplace entry {name!r}")
+        if isinstance(data, dict):
+            if data.get("name") != name:
+                errors.append(f"{rel}: plugin.json name {data.get('name')!r} differs from the marketplace entry {name!r}")
+            extra = sorted(set(data) - MANIFEST_KEYS)
+            if extra:    # mcpServers, hooks, commands, agents... must not arrive by the back door
+                errors.append(f"{rel}/.claude-plugin/plugin.json: unexpected keys {', '.join(extra)}")
+        elif data is not None:
+            errors.append(f"{rel}/.claude-plugin/plugin.json: must be an object")
     skills = sorted(folder.glob("skills/*/SKILL.md"))
     for skill in skills:
         where = skill.relative_to(root).as_posix()
@@ -134,20 +206,9 @@ def check_plugin_folder(folder: Path, name: str, root: Path) -> list[str]:
             errors.append(f"{where}: frontmatter description is required, at most 1024 characters")
     mcp = folder / ".mcp.json"
     if mcp.exists():
-        data = read_json(mcp, errors, f"{rel}/.mcp.json") or {}
-        servers = data.get("mcpServers")
-        if not isinstance(servers, dict) or not servers:
-            errors.append(f"{rel}/.mcp.json: needs a non-empty mcpServers object")
-        for server_name, server in (servers if isinstance(servers, dict) else {}).items():
-            where = f"{rel}/.mcp.json {server_name}"
-            if server.get("type") not in ("http", "sse"):
-                errors.append(f"{where}: only remote servers (type http) are shipped here")
-            if not str(server.get("url", "")).startswith("https://"):
-                errors.append(f"{where}: url must be https")
-            for header, value in (server.get("headers") or {}).items():
-                if not ENV_HEADER.match(str(value)):
-                    errors.append(f"{where}: header {header} must come from an environment variable "
-                                  "(\"${NAME}\" or \"Bearer ${NAME}\"), never a literal value")
+        data = read_json(mcp, errors, f"{rel}/.mcp.json")
+        if data is not None:
+            errors += check_mcp_servers(data.get("mcpServers") if isinstance(data, dict) else None, f"{rel}/.mcp.json")
     if not manifest.exists() and not skills and not mcp.exists():
         errors.append(f"{rel}: has no plugin.json, skill or .mcp.json")
     return errors
@@ -155,7 +216,9 @@ def check_plugin_folder(folder: Path, name: str, root: Path) -> list[str]:
 
 def check_plugins(root: Path) -> list[str]:
     """The Claude Code marketplace in .claude-plugin/ and the plugins it ships. `claude plugin
-    validate .` checks the same files more fully; this keeps CI free of that dependency."""
+    validate .` checks the same files more fully; this keeps CI free of that dependency, and adds
+    what it does not: no credential, command or unreviewed host can ship in a plugin here, and a
+    plugin from another repository is pinned to the commit that was reviewed."""
     path = root / ".claude-plugin" / "marketplace.json"
     if not path.exists():
         return []
@@ -163,16 +226,29 @@ def check_plugins(root: Path) -> list[str]:
     market = read_json(path, errors, ".claude-plugin/marketplace.json")
     if market is None:
         return errors
+    if not isinstance(market, dict):
+        return [".claude-plugin/marketplace.json: must be an object"]
+    if TOKEN.search(path.read_text(encoding="utf-8")):
+        errors.append(".claude-plugin/marketplace.json: contains what looks like a credential")
+    extra = sorted(set(market) - MARKETPLACE_KEYS)
+    if extra:
+        errors.append(f".claude-plugin/marketplace.json: unexpected keys {', '.join(extra)}")
     if not KEBAB.match(str(market.get("name", ""))):
         errors.append(".claude-plugin/marketplace.json: name must be kebab-case")
-    if not (market.get("owner") or {}).get("name"):
+    if not isinstance(market.get("owner"), dict) or not market["owner"].get("name"):
         errors.append(".claude-plugin/marketplace.json: owner.name is required")
-    plugins = market.get("plugins") or []
-    if not plugins:
-        errors.append(".claude-plugin/marketplace.json: lists no plugins")
+    plugins = market.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        return errors + [".claude-plugin/marketplace.json: plugins must be a non-empty list"]
     base = root.resolve()
     for number, plugin in enumerate(plugins):
         where = f".claude-plugin/marketplace.json plugins[{number}]"
+        if not isinstance(plugin, dict):
+            errors.append(f"{where}: must be an object")
+            continue
+        extra = sorted(set(plugin) - ENTRY_KEYS)
+        if extra:    # mcpServers, hooks, strict... in an entry would bypass the folder checks
+            errors.append(f"{where}: unexpected keys {', '.join(extra)}")
         name, source = str(plugin.get("name", "")), plugin.get("source")
         if not KEBAB.match(name):
             errors.append(f"{where}: name must be kebab-case")
@@ -190,6 +266,10 @@ def check_plugins(root: Path) -> list[str]:
                 errors.append(f"{where}: source repo must be owner/name")
             elif kind != "github" and not str(source.get("url", "")).startswith("https://"):
                 errors.append(f"{where}: source url must be https")
+            # Unpinned, a plugin from another repository installs whatever its branch holds that day,
+            # scripts included, and none of it passes this repository's review.
+            if not SHA.match(str(source.get("sha", ""))):
+                errors.append(f"{where}: a plugin from another repository must be pinned with a 40-character sha")
         else:
             errors.append(f"{where}: source is missing")
     return errors
@@ -200,7 +280,10 @@ def main() -> int:
     files = ([root_index] if root_index.exists() else []) + sorted(ROOT.glob("*/llms.txt"))
     errors = [] if root_index.exists() else ["llms.txt: missing; run python scripts/generate.py --catalog-only"]
     errors += [error for path in files for error in check(path)]
-    catalog_errors = catalog.check_all(ROOT)
+    try:
+        catalog_errors = catalog.check_all(ROOT)
+    except (OSError, UnicodeDecodeError, ValueError) as error:    # JSONDecodeError is a ValueError
+        catalog_errors = [f"catalog.json or catalog.schema.json: not readable ({error})"]
     errors += catalog_errors
     if not catalog_errors:
         errors += [f"{path}: does not match catalog.json, guides/ and the indexes; "

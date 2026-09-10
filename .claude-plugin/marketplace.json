@@ -37,7 +37,8 @@
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/odradev/odradev-plugins.git",
-        "path": "plugins/odra-plugin"
+        "path": "plugins/odra-plugin",
+        "sha": "d66e542c94eafe29103a9e0a6f75db4c2bbeecd3"
       },
       "description": "Odra's own plugin for writing, testing and deploying Odra smart contracts, installed from odradev/odradev-plugins.",
       "category": "blockchain"
