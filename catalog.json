@@ -1,0 +1,25 @@
+{
+  "$schema": "./catalog.schema.json",
+  "capabilities": [
+    {
+      "id": "casper-mcp",
+      "name": "casper-mcp",
+      "kind": "mcp-server",
+      "publisher": { "name": "msanlisavas", "url": "https://github.com/msanlisavas" },
+      "description": "Self-hosted MCP server for Casper on-chain data through CSPR.cloud: accounts, blocks, deploys, validators, contracts, tokens and NFTs, with optional locally signed write tools in stdio mode.",
+      "url": "https://github.com/msanlisavas/casper-mcp",
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/msanlisavas/casper-mcp/main/README.md",
+        "cite": "https://github.com/msanlisavas/casper-mcp"
+      },
+      "transport": ["stdio", "streamable-http"],
+      "auth": ["api-key"],
+      "pricing": "free",
+      "networks": ["casper:casper", "casper:casper-test"],
+      "source": "https://github.com/msanlisavas/casper-mcp",
+      "license": "MIT",
+      "install": "docker run -i ghcr.io/msanlisavas/casper-mcp:latest --api-key <CSPR-CLOUD-API-KEY>",
+      "ours": true
+    }
+  ]
+}

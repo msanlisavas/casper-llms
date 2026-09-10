@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/msanlisavas/casper-llms/blob/main/catalog.schema.json",
+  "title": "Casper AI capability catalog",
+  "description": "Checked by scripts/validate.py with a standard-library checker that supports only the keywords used here.",
+  "type": "object",
+  "required": ["capabilities"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "capabilities": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/capability" } }
+  },
+  "$defs": {
+    "url": { "type": "string", "pattern": "^https://[^\\s/]+[^\\s]*$" },
+    "label": { "type": "string", "minLength": 2, "maxLength": 80, "pattern": "^[^\\[\\]|\\n]+$" },
+    "sentence": { "type": "string", "pattern": "^[^\\n|]+$" },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "publisher", "description", "url", "docs", "pricing"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64 },
+        "name": { "$ref": "#/$defs/label" },
+        "kind": {
+          "description": "mcp-server, agent-skill, llms-txt (a documentation index), api, sdk, or plugin (an agent plugin or plugin marketplace).",
+          "enum": ["mcp-server", "agent-skill", "llms-txt", "api", "sdk", "plugin"]
+        },
+        "publisher": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "url"],
+          "properties": { "name": { "$ref": "#/$defs/label" }, "url": { "$ref": "#/$defs/url" } }
+        },
+        "description": {
+          "description": "One or two factual sentences, no marketing.",
+          "allOf": [{ "$ref": "#/$defs/sentence" }, { "type": "string", "minLength": 20, "maxLength": 300 }]
+        },
+        "url": {
+          "description": "What a client points at: the MCP endpoint, the llms.txt or SKILL.md URL, the API base, or the package page.",
+          "$ref": "#/$defs/url"
+        },
+        "docs": {
+          "description": "fetch: a markdown or plain-text page an ingester can read. cite: where a person reads it.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fetch", "cite"],
+          "properties": { "fetch": { "$ref": "#/$defs/url" }, "cite": { "$ref": "#/$defs/url" } }
+        },
+        "transport": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["streamable-http", "stdio", "sse"] } },
+        "auth": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["none", "api-key", "x402", "oauth"] } },
+        "pricing": { "enum": ["free", "paid", "free-and-paid"] },
+        "pricingNote": { "allOf": [{ "$ref": "#/$defs/sentence" }, { "type": "string", "minLength": 5, "maxLength": 200 }] },
+        "networks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["casper:casper", "casper:casper-test"] } },
+        "source": { "$ref": "#/$defs/url" },
+        "license": { "type": "string", "pattern": "^[A-Za-z0-9.+-]+( (AND|OR) [A-Za-z0-9.+-]+)*$" },
+        "install": { "type": "string", "maxLength": 200, "pattern": "^[^`\\n|]+$" },
+        "ours": { "description": "Present, and true, only for capabilities this repository's maintainer publishes.", "const": true }
+      },
+      "allOf": [
+        { "if": { "required": ["kind"], "properties": { "kind": { "const": "mcp-server" } } }, "then": { "required": ["transport", "auth"] } },
+        { "if": { "required": ["kind"], "properties": { "kind": { "const": "api" } } }, "then": { "required": ["auth"] } },
+        { "if": { "required": ["pricing"], "properties": { "pricing": { "enum": ["paid", "free-and-paid"] } } }, "then": { "required": ["pricingNote"] } }
+      ]
+    }
+  }
+}
