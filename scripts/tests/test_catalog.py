@@ -125,7 +125,8 @@ class RenderTests(unittest.TestCase):
                      docs={"fetch": "https://example.org/llms.txt", "cite": "https://example.org"},
                      transport=None, auth=None)
         self.write("catalog.json", json.dumps({"capabilities": [entry(), llms]}))
-        self.write("README.md", "# x\n\n<!-- catalog:start -->\nold\n<!-- catalog:end -->\n\n"
+        self.write("README.md", "# x\n\n<!-- indexes:start -->\n<!-- indexes:end -->\n\n"
+                                "<!-- catalog:start -->\nold\n<!-- catalog:end -->\n\n"
                                 "<!-- guides:start -->\n<!-- guides:end -->\n")
         self.write("casper-docs/llms.txt", INDEX)
         self.write("guides/a.md", GOOD_GUIDE)
@@ -185,6 +186,11 @@ class RenderTests(unittest.TestCase):
         self.assertTrue(links)
         for anchor in links:
             self.assertIn(anchor, anchors)
+
+    def test_the_readme_index_table_counts_pages(self):
+        catalog.write_all(self.root)
+        self.assertIn("| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 1 | The docs, e.g. concepts |", self.read("README.md"))
+        self.assertIn("| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 1 |", self.read("README.md"))
 
     def test_missing_readme_markers_fail_loudly(self):
         self.write("README.md", "# x\n")

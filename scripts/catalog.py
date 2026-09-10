@@ -345,6 +345,12 @@ def render_catalog_table(entries: list[dict], anchors: dict[str, str]) -> str:
     return "\n".join(rows)
 
 
+def render_indexes_table(indexes: list[LocalIndex]) -> str:
+    rows = ["| Index | Pages | Covers |", "|---|---|---|"]
+    rows += [f"| [`{i.path}`]({i.path}) | {i.pages} | {lead(i.summary).rstrip('.').replace('|', '/')} |" for i in indexes]
+    return "\n".join(rows)
+
+
 def render_guides_list(guides: list[Guide]) -> str:
     return "\n".join(f"- [{g.title}]({g.path}). {g.verified}" for g in guides) or "No guides yet."
 
@@ -390,6 +396,7 @@ def render_all(root: Path = ROOT) -> dict[Path, str]:
     directory, anchors = render_directory(entries, indexes)
     outputs[root / "directory.md"] = directory
     readme = (root / "README.md").read_text(encoding="utf-8")
+    readme = replace_block(readme, "indexes", render_indexes_table(indexes))
     readme = replace_block(readme, "catalog", render_catalog_table(entries, anchors))
     outputs[root / "README.md"] = replace_block(readme, "guides", render_guides_list(guides))
     return outputs

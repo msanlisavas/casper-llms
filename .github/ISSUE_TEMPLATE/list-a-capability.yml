@@ -1,0 +1,74 @@
+name: List an AI capability
+description: An MCP server, agent skill, llms.txt, API, SDK or plugin for the Casper Network.
+labels: ["catalog"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! A maintainer will turn this into a `catalog.json` entry. You can also open a pull request yourself; see CONTRIBUTING.md.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      placeholder: Example MCP server
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - MCP server
+        - Agent skill (SKILL.md)
+        - llms.txt documentation index
+        - API for agents (including x402 pay-per-call)
+        - SDK or library for agent or x402 integration
+        - Agent plugin or plugin marketplace
+    validations:
+      required: true
+  - type: input
+    id: publisher
+    attributes:
+      label: Publisher
+      description: Who runs or maintains it, and a link to them.
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Endpoint or URL
+      description: What a client points at, e.g. the MCP endpoint, the SKILL.md or llms.txt URL, the API base URL, or the package page.
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Documentation as markdown or plain text
+      description: A raw README, a .md page or an llms.txt. HTML-only documentation cannot be listed.
+    validations:
+      required: true
+  - type: textarea
+    id: access
+    attributes:
+      label: Authentication, pricing and networks
+      description: How clients authenticate (none, API key, x402, OAuth), what it costs, and whether it works on mainnet, testnet or both.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source repository and license
+      description: Optional for closed-source services.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Listing rules
+      options:
+        - label: It is public and works with Casper mainnet or testnet.
+          required: true
+        - label: It never asks users to send a secret key or seed phrase to a remote service.
+          required: true
+        - label: If it is paid, its pricing is stated publicly.
+          required: true
+        - label: I am its publisher, or I have checked that the details above are current.
+          required: true
