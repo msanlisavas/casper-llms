@@ -1,0 +1,16 @@
+{
+  "name": "cspr-cloud",
+  "description": "Connects the hosted CSPR.cloud MCP servers by MAKE for Casper mainnet and testnet data. Needs CSPR_CLOUD_API_KEY set in your environment.",
+  "version": "1.0.0",
+  "author": {
+    "name": "msanlisavas"
+  },
+  "homepage": "https://github.com/msanlisavas/casper-llms",
+  "repository": "https://github.com/msanlisavas/casper-llms",
+  "license": "MIT",
+  "keywords": [
+    "casper",
+    "cspr",
+    "mcp"
+  ]
+}

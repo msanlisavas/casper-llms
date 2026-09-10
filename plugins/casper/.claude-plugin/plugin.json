@@ -1,0 +1,17 @@
+{
+  "name": "casper",
+  "description": "The casper skill: where current Casper documentation lives, what changed since the 2.0 docs, casper-client 5.x commands, and which MCP server answers what.",
+  "version": "1.0.0",
+  "author": {
+    "name": "msanlisavas"
+  },
+  "homepage": "https://github.com/msanlisavas/casper-llms",
+  "repository": "https://github.com/msanlisavas/casper-llms",
+  "license": "MIT",
+  "keywords": [
+    "casper",
+    "cspr",
+    "blockchain",
+    "llms-txt"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "casper-llms",
+  "owner": {
+    "name": "msanlisavas"
+  },
+  "metadata": {
+    "description": "AI capabilities for the Casper Network: a skill that answers Casper questions from current, cited sources, and ready-made connections to Casper MCP servers.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "casper",
+      "source": "./plugins/casper",
+      "description": "The casper skill: where current Casper documentation lives, what changed since the 2.0 docs, casper-client 5.x commands, and which MCP server answers what.",
+      "category": "blockchain"
+    },
+    {
+      "name": "cspr-trade",
+      "source": "./plugins/cspr-trade",
+      "description": "Connects the public CSPR.trade MCP server by MAKE: Casper DEX market data, quotes and non-custodial swap building. No key needed.",
+      "category": "blockchain"
+    },
+    {
+      "name": "cspr-cloud",
+      "source": "./plugins/cspr-cloud",
+      "description": "Connects the hosted CSPR.cloud MCP servers by MAKE for Casper mainnet and testnet data. Needs CSPR_CLOUD_API_KEY set in your environment.",
+      "category": "blockchain"
+    },
+    {
+      "name": "casperai",
+      "source": "./plugins/casperai",
+      "description": "Connects CasperAI's MCP server: cited answers about Casper (paid per call) and casper-client command building (free). Needs CASPERAI_API_KEY set in your environment.",
+      "category": "blockchain"
+    },
+    {
+      "name": "odra-plugin",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/odradev/odradev-plugins.git",
+        "path": "plugins/odra-plugin"
+      },
+      "description": "Odra's own plugin for writing, testing and deploying Odra smart contracts, installed from odradev/odradev-plugins.",
+      "category": "blockchain"
+    }
+  ]
+}

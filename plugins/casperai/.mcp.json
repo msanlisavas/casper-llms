@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "casperai": {
+      "type": "http",
+      "url": "https://casperai.ekolsoft.com/v1/mcp",
+      "headers": {
+        "Authorization": "Bearer ${CASPERAI_API_KEY}"
+      }
+    }
+  }
+}

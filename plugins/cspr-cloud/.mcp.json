@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "cspr-cloud": {
+      "type": "http",
+      "url": "https://mcp.cspr.cloud/mcp",
+      "headers": {
+        "X-CSPR-Cloud-Api-Key": "${CSPR_CLOUD_API_KEY}"
+      }
+    },
+    "cspr-cloud-testnet": {
+      "type": "http",
+      "url": "https://mcp.testnet.cspr.cloud/mcp",
+      "headers": {
+        "X-CSPR-Cloud-Api-Key": "${CSPR_CLOUD_API_KEY}"
+      }
+    }
+  }
+}

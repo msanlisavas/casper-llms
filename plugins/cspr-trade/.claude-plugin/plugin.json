@@ -1,0 +1,17 @@
+{
+  "name": "cspr-trade",
+  "description": "Connects the public CSPR.trade MCP server by MAKE: Casper DEX market data, quotes and non-custodial swap building. No key needed.",
+  "version": "1.0.0",
+  "author": {
+    "name": "msanlisavas"
+  },
+  "homepage": "https://github.com/msanlisavas/casper-llms",
+  "repository": "https://github.com/msanlisavas/casper-llms",
+  "license": "MIT",
+  "keywords": [
+    "casper",
+    "cspr",
+    "dex",
+    "mcp"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "casperai",
+  "description": "Connects CasperAI's MCP server: cited answers about Casper (paid per call) and casper-client command building (free). Needs CASPERAI_API_KEY set in your environment.",
+  "version": "1.0.0",
+  "author": {
+    "name": "msanlisavas"
+  },
+  "homepage": "https://github.com/msanlisavas/casper-llms",
+  "repository": "https://github.com/msanlisavas/casper-llms",
+  "license": "MIT",
+  "keywords": [
+    "casper",
+    "cspr",
+    "mcp"
+  ]
+}
