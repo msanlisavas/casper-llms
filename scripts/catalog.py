@@ -39,6 +39,7 @@ KINDS = {
 AUTH = {"none": "no key", "api-key": "API key", "x402": "x402 per call", "oauth": "OAuth"}
 NETWORKS = {"casper:casper": "mainnet", "casper:casper-test": "testnet"}
 TRANSPORTS = {"streamable-http": "Streamable HTTP", "stdio": "stdio", "sse": "SSE"}
+HOSTING = {"hosted": "Hosted", "self-hosted": "Self-hosted"}
 PRICING = {"free": "Free", "paid": "Paid", "free-and-paid": "Free and paid"}
 
 # Release lines a guide can be verified against. check.py looks up the latest of each; a guide
@@ -200,3 +201,210 @@ def check_all(root: Path = ROOT) -> list[str]:
     guides, errors = local_guides(root)
     data, schema = load_json(root / "catalog.json"), load_json(root / "catalog.schema.json")
     return errors + check_catalog(data, schema, reserved_fetch_urls(root, guides))
+
+
+# ----------------------------------------------------------------------------- rendering
+
+def link(title: str, fetch: str, cite: str, note: str = "") -> str:
+    title = title.replace("[", "(").replace("]", ")")   # the link grammar allows no ']' in a title
+    return f"- [{title}]({fetch}): {cite}" + (f" - {note}" if note else "")
+
+
+def lead(summary: str) -> str:
+    """What an index covers, in brief: its summary's first sentence, cut at the colon that
+    introduces the details ("Developer documentation for the Casper SDKs: the JavaScript...")."""
+    match = re.match(r"(.+?(?<!e\.g)(?<!i\.e)[.!?])(?=\s|$)", summary)
+    sentence = match.group(1) if match else summary
+    head, colon, _ = sentence.partition(": ")
+    return head.rstrip(".") + "." if colon else sentence
+
+
+def pages(count: int) -> str:
+    return f"{count} page{'' if count == 1 else 's'}"
+
+
+def by_kind(entries: list[dict], kind: str) -> list[dict]:
+    return sorted((e for e in entries if e["kind"] == kind), key=lambda e: e["name"].lower())
+
+
+def has_endpoint(entry: dict) -> bool:
+    """A self-hosted MCP server's url is its project page: there is no endpoint to point at."""
+    return entry["kind"] == "api" or (entry["kind"] == "mcp-server" and entry.get("hosting") == "hosted")
+
+
+def entry_note(entry: dict) -> str:
+    return entry["description"] + (f" Endpoint: {entry['url']}." if has_endpoint(entry) else "")
+
+
+def slug(heading: str, used: dict[str, int]) -> str:
+    """GitHub's heading anchor: lowercase, punctuation dropped, spaces to hyphens, repeats numbered."""
+    base = re.sub(r"[^\w\- ]", "", heading.strip().lower()).replace(" ", "-")
+    count = used.get(base, 0)
+    used[base] = count + 1
+    return base if count == 0 else f"{base}-{count}"
+
+
+def render_root(entries: list[dict], indexes: list[LocalIndex], guides: list[Guide]) -> str:
+    sections = {
+        "Start here": [link("Casper AI directory", RAW + "directory.md", BLOB + "directory.md",
+                            "Every capability listed here, with its endpoint, authentication, pricing, networks "
+                            "and source.")]
+                      + [link(g.title, RAW + g.path, BLOB + g.path, g.verified) for g in guides],
+        "Documentation indexes": [link(i.title, RAW + i.path, BLOB + i.path, f"{pages(i.pages)}. {lead(i.summary)}")
+                                  for i in indexes]
+                                 + [link(e["name"], e["docs"]["fetch"], e["docs"]["cite"], e["description"])
+                                    for e in by_kind(entries, "llms-txt")],
+    }
+    for kind, (heading, _) in KINDS.items():
+        if kind != "llms-txt" and by_kind(entries, kind):
+            sections[heading] = [link(e["name"], e["docs"]["fetch"], e["docs"]["cite"], entry_note(e))
+                                 for e in by_kind(entries, kind)]
+    lines = [
+        "# Casper Network for AI agents", "",
+        "> The starting point for AI agents and LLM tools working with the Casper Network: documentation indexes, "
+        "guides to what has changed since the 2.0 documentation, and the MCP servers, agent skills, plugins, APIs "
+        "and SDKs built for agents, from across the ecosystem.", "",
+        "Each link fetches markdown or plain text. The URL after the colon is where a person reads it, followed by "
+        "a short description.",
+        f"Maintained at https://github.com/{SELF_REPO} and generated from its catalog.json.", "",
+    ]
+    for heading, items in sections.items():
+        lines += [f"## {heading}", "", *items, ""]
+    return "\n".join(lines).rstrip("\n") + "\n"
+
+
+def fields(entry: dict) -> list[tuple[str, str]]:
+    out = [("Endpoint" if has_endpoint(entry) else "URL", entry["url"])]
+    if entry.get("hosting"):
+        out.append(("Hosting", HOSTING[entry["hosting"]]))
+    if entry.get("transport"):
+        out.append(("Transport", ", ".join(TRANSPORTS[t] for t in entry["transport"])))
+    if entry.get("auth"):
+        out.append(("Authentication", ", ".join(AUTH[a] for a in entry["auth"])))
+    out.append(("Pricing", PRICING[entry["pricing"]] + (f" - {entry['pricingNote']}" if entry.get("pricingNote") else "")))
+    if entry.get("networks"):
+        out.append(("Networks", ", ".join(NETWORKS[n] for n in entry["networks"])))
+    publisher = f"[{entry['publisher']['name']}]({entry['publisher']['url']})"
+    out.append(("Publisher", publisher + (" (maintained here)" if entry.get("ours") else "")))
+    out.append(("Documentation", entry["docs"]["cite"]))
+    if entry.get("source"):
+        out.append(("Source", entry["source"] + (f" ({entry['license']})" if entry.get("license") else "")))
+    elif entry.get("license"):
+        out.append(("License", entry["license"]))
+    if entry.get("install"):
+        out.append(("Install", f"`{entry['install']}`"))
+    return out
+
+
+def render_directory(entries: list[dict], indexes: list[LocalIndex]) -> tuple[str, dict[str, str]]:
+    used: dict[str, int] = {}
+    anchors: dict[str, str] = {}
+    lines: list[str] = []
+
+    def heading(level: int, text: str, entry_id: str | None = None) -> None:
+        anchor = slug(text, used)
+        if entry_id:
+            anchors[entry_id] = anchor
+        lines.extend([f"{'#' * level} {text}", ""])
+
+    heading(1, "Casper AI directory")
+    lines += [
+        "Every AI capability for the Casper Network that this repository lists: documentation indexes, MCP "
+        "servers, agent skills, plugins, APIs and SDKs, from across the ecosystem. It is generated from "
+        f"{BLOB}catalog.json, and a weekly check confirms that each endpoint still answers and each entry's "
+        f"documentation is still readable. To list a capability, see {BLOB}CONTRIBUTING.md.", "",
+        "Entries marked \"maintained here\" are published by this repository's maintainer.", "",
+    ]
+    for kind, (title, _) in KINDS.items():
+        group = by_kind(entries, kind)
+        if kind == "llms-txt":
+            heading(2, title)
+            lines += ["Generated by this repository; each link in them fetches raw markdown and cites the "
+                      "published page:", ""]
+            lines += [f"- [{i.title}]({BLOB}{i.path}) - {pages(i.pages)}. {lead(i.summary)} Fetch: {RAW}{i.path}"
+                      for i in indexes]
+            lines.append("")
+        elif group:
+            heading(2, title)
+        for entry in group:
+            heading(3, entry["name"], entry["id"])
+            lines += [entry["description"], ""]
+            lines += [f"- **{label}:** {value}" for label, value in fields(entry)]
+            lines.append("")
+    return "\n".join(lines).rstrip("\n") + "\n", anchors
+
+
+def render_catalog_table(entries: list[dict], anchors: dict[str, str]) -> str:
+    rows = ["| Capability | Kind | Publisher | Access |", "|---|---|---|---|"]
+    for kind, (_, label) in KINDS.items():
+        for e in by_kind(entries, kind):
+            auth = ", ".join(AUTH[a] for a in e.get("auth", []))
+            access = f"{auth}; {PRICING[e['pricing']].lower()}" if auth else PRICING[e["pricing"]]
+            rows.append(f"| [{e['name']}](directory.md#{anchors[e['id']]}) | {label} | {e['publisher']['name']} "
+                        f"| {access} |")
+    return "\n".join(rows)
+
+
+def render_guides_list(guides: list[Guide]) -> str:
+    return "\n".join(f"- [{g.title}]({g.path}). {g.verified}" for g in guides) or "No guides yet."
+
+
+def render_guides_index(guides: list[Guide]) -> str:
+    lines = [
+        "# Casper guides", "",
+        "> Guides written for this repository on what the official Casper documentation does not cover yet. "
+        "Every factual sentence links a pinned source (a release tag or a commit), each guide names the releases it "
+        "was verified against on its third line, and a weekly check flags a guide when a newer release ships.", "",
+        "Each link fetches the page's raw markdown; the URL after the colon is where it is published.",
+        f"Generated by https://github.com/{SELF_REPO} from its guides folder.", "",
+        "## Guides", "",
+    ]
+    lines += [link(g.title, RAW + g.path, BLOB + g.path) for g in guides]
+    return "\n".join(lines) + "\n"
+
+
+def replace_block(text: str, name: str, body: str) -> str:
+    start, end = f"<!-- {name}:start -->", f"<!-- {name}:end -->"
+    before, found_start, rest = text.partition(start)
+    _, found_end, after = rest.partition(end)
+    if not found_start or not found_end:
+        raise ValueError(f"README.md needs the markers {start} and {end}")
+    return f"{before}{start}\n{body}\n{end}{after}"
+
+
+def index_order(path: str) -> tuple[int, str]:
+    folder = path.split("/", 1)[0]
+    return (INDEX_ORDER.index(folder) if folder in INDEX_ORDER else len(INDEX_ORDER), folder)
+
+
+def render_all(root: Path = ROOT) -> dict[Path, str]:
+    entries = load_json(root / "catalog.json")["capabilities"]
+    guides, _ = local_guides(root)
+    outputs: dict[Path, str] = {}
+    if guides:
+        outputs[root / GUIDES_INDEX] = render_guides_index(guides)
+    files = {f.relative_to(root).as_posix(): f.read_text(encoding="utf-8") for f in root.glob("*/llms.txt")}
+    files.update({path.relative_to(root).as_posix(): text for path, text in outputs.items()})
+    indexes = sorted((parse_index(path, text) for path, text in files.items()), key=lambda i: index_order(i.path))
+    outputs[root / "llms.txt"] = render_root(entries, indexes, guides)
+    directory, anchors = render_directory(entries, indexes)
+    outputs[root / "directory.md"] = directory
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    readme = replace_block(readme, "catalog", render_catalog_table(entries, anchors))
+    outputs[root / "README.md"] = replace_block(readme, "guides", render_guides_list(guides))
+    return outputs
+
+
+def write_all(root: Path = ROOT) -> list[str]:
+    changed = []
+    for path, text in render_all(root).items():
+        if not path.exists() or path.read_text(encoding="utf-8") != text:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8", newline="\n")
+            changed.append(path.relative_to(root).as_posix())
+    return changed
+
+
+def stale_outputs(root: Path = ROOT) -> list[str]:
+    return [path.relative_to(root).as_posix() for path, text in render_all(root).items()
+            if not path.exists() or path.read_text(encoding="utf-8") != text]

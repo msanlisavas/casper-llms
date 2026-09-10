@@ -1,10 +1,14 @@
 import json
+import re
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import catalog  # noqa: E402
+import validate  # noqa: E402
 
 SCHEMA = catalog.load_json(catalog.ROOT / "catalog.schema.json")
 
@@ -16,7 +20,7 @@ def entry(**changes):
         "description": "Reads Casper accounts and blocks for an agent.",
         "url": "https://mcp.example.org/mcp",
         "docs": {"fetch": "https://example.org/mcp.md", "cite": "https://example.org/mcp"},
-        "transport": ["streamable-http"], "auth": ["none"], "pricing": "free",
+        "hosting": "hosted", "transport": ["streamable-http"], "auth": ["none"], "pricing": "free",
     }
     base.update(changes)
     return {key: value for key, value in base.items() if value is not None}
@@ -38,6 +42,7 @@ class SchemaTests(unittest.TestCase):
 
     def test_an_mcp_server_must_say_how_to_connect(self):
         self.assertIn("missing required field 'transport'", errors_for(entry(transport=None)))
+        self.assertIn("missing required field 'hosting'", errors_for(entry(hosting=None)))
 
     def test_a_paid_capability_must_say_what_it_costs(self):
         self.assertIn("pricingNote", errors_for(entry(pricing="paid")))
@@ -106,6 +111,90 @@ class GuideTests(unittest.TestCase):
     def test_html_is_refused(self):
         _, errors = catalog.parse_guide("guides/a.md", GOOD_GUIDE + "<div>x</div>\n")
         self.assertTrue(any("HTML" in e for e in errors))
+
+
+INDEX = ("# Casper docs\n\n> The docs, e.g. concepts. More text.\n\n## A\n\n"
+         "- [Page](https://raw.githubusercontent.com/o/r/main/p.md): https://docs.example.org/p\n")
+
+
+class RenderTests(unittest.TestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        self.write("catalog.schema.json", json.dumps(SCHEMA))
+        llms = entry(id="example-docs", name="Example docs", kind="llms-txt", url="https://example.org/llms.txt",
+                     docs={"fetch": "https://example.org/llms.txt", "cite": "https://example.org"},
+                     transport=None, auth=None)
+        self.write("catalog.json", json.dumps({"capabilities": [entry(), llms]}))
+        self.write("README.md", "# x\n\n<!-- catalog:start -->\nold\n<!-- catalog:end -->\n\n"
+                                "<!-- guides:start -->\n<!-- guides:end -->\n")
+        self.write("casper-docs/llms.txt", INDEX)
+        self.write("guides/a.md", GOOD_GUIDE)
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+
+    def write(self, path, text):
+        (self.root / path).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / path).write_text(text, encoding="utf-8")
+
+    def read(self, path):
+        return (self.root / path).read_text(encoding="utf-8")
+
+    def test_after_writing_nothing_is_stale(self):
+        changed = catalog.write_all(self.root)
+        self.assertEqual(set(changed), {"llms.txt", "directory.md", "README.md", "casper-guides/llms.txt"})
+        self.assertEqual(catalog.stale_outputs(self.root), [])
+
+    def test_editing_the_catalog_makes_the_renders_stale(self):
+        catalog.write_all(self.root)
+        self.write("catalog.json", json.dumps({"capabilities": [entry(name="Renamed server")]}))
+        self.assertIn("llms.txt", catalog.stale_outputs(self.root))
+
+    def test_the_root_index_obeys_the_ingester_grammar(self):
+        catalog.write_all(self.root)
+        text = self.read("llms.txt")
+        self.assertEqual(validate.check_text(text, "llms.txt"), [])
+        self.assertIn("## MCP servers", text)
+        self.assertIn("Endpoint: https://mcp.example.org/mcp.", text)
+        self.assertIn("[A guide](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/a.md)", text)
+        self.assertIn("1 page. The docs, e.g. concepts.", text)
+
+    def test_a_self_hosted_server_has_no_endpoint(self):
+        self_hosted = entry(hosting="self-hosted", url="https://github.com/example/server")
+        self.write("catalog.json", json.dumps({"capabilities": [self_hosted]}))
+        catalog.write_all(self.root)
+        self.assertNotIn("Endpoint", self.read("llms.txt"))
+        self.assertIn("- **Hosting:** Self-hosted", self.read("directory.md"))
+
+    def test_an_index_is_described_by_the_lead_of_its_summary(self):
+        self.write("casper-docs/llms.txt", INDEX.replace("The docs, e.g. concepts. More text.",
+                                                         "The node software: casper-client, the sidecar. More."))
+        catalog.write_all(self.root)
+        self.assertIn("1 page. The node software.", self.read("llms.txt"))
+
+    def test_the_guides_index_obeys_the_grammar_and_the_root_lists_it(self):
+        catalog.write_all(self.root)
+        self.assertEqual(validate.check_text(self.read("casper-guides/llms.txt"), "casper-guides/llms.txt"), [])
+        self.assertIn(catalog.RAW + "casper-guides/llms.txt", self.read("llms.txt"))
+
+    def test_readme_links_land_on_directory_headings(self):
+        catalog.write_all(self.root)
+        used = {}
+        anchors = [catalog.slug(h, used) for h in re.findall(r"^#{1,6} (.+)$", self.read("directory.md"), re.M)]
+        links = re.findall(r"directory\.md#([\w-]+)", self.read("README.md"))
+        self.assertTrue(links)
+        for anchor in links:
+            self.assertIn(anchor, anchors)
+
+    def test_missing_readme_markers_fail_loudly(self):
+        self.write("README.md", "# x\n")
+        with self.assertRaises(ValueError):
+            catalog.render_all(self.root)
+
+    def test_slugs_match_github(self):
+        used = {}
+        self.assertEqual(catalog.slug("CSPR.cloud MCP server", used), "csprcloud-mcp-server")
+        self.assertEqual(catalog.slug("CSPR.cloud MCP server", used), "csprcloud-mcp-server-1")
 
 
 if __name__ == "__main__":

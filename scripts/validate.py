@@ -12,13 +12,22 @@ is a way a page silently disappears at ingestion rather than failing loudly:
 - a section whose heading contains "(latest)" makes CasperAI drop other versioned sections;
 - no fetch URL is listed twice, and no index exceeds 1000 links (CasperAI reads no further).
 
-Usage:  python scripts/validate.py        exit status 1 if any index breaks a rule.
+It also checks what is written by hand or rendered from it:
+
+- catalog.json must satisfy catalog.schema.json, and each guide must open with its H1 and its
+  "Verified against ..." line;
+- the root llms.txt, directory.md, the README blocks and casper-guides/llms.txt must match what
+  catalog.json, guides/ and the indexes render - a hand edit to any of them is overwritten.
+
+Usage:  python scripts/validate.py        exit status 1 if anything breaks a rule.
 """
 from __future__ import annotations
 
 import re
 import sys
 from pathlib import Path
+
+import catalog
 
 ROOT = Path(__file__).resolve().parent.parent
 LINK = re.compile(r"^-\s*\[(?P<title>[^\]]+)\]\((?P<url>[^)\s]+)\)(\s*:\s*(?P<notes>.+))?\s*$")
@@ -27,9 +36,11 @@ MAX_LINKS = 1000
 
 
 def check(path: Path) -> list[str]:
+    return check_text(path.read_text(encoding="utf-8"), path.relative_to(ROOT).as_posix())
+
+
+def check_text(text: str, name: str) -> list[str]:
     errors: list[str] = []
-    text = path.read_text(encoding="utf-8")
-    name = path.relative_to(ROOT).as_posix()
     if text.startswith(chr(0xFEFF)):
         errors.append(f"{name}: starts with a byte-order mark")
     if not text.lstrip().startswith("# "):
@@ -77,11 +88,15 @@ def check(path: Path) -> list[str]:
 
 
 def main() -> int:
-    files = sorted(ROOT.glob("*/llms.txt"))
-    if not files:
-        print("no */llms.txt files found")
-        return 1
-    errors = [error for path in files for error in check(path)]
+    root_index = ROOT / "llms.txt"
+    files = ([root_index] if root_index.exists() else []) + sorted(ROOT.glob("*/llms.txt"))
+    errors = [] if root_index.exists() else ["llms.txt: missing; run python scripts/generate.py --catalog-only"]
+    errors += [error for path in files for error in check(path)]
+    catalog_errors = catalog.check_all(ROOT)
+    errors += catalog_errors
+    if not catalog_errors:
+        errors += [f"{path}: does not match catalog.json, guides/ and the indexes; "
+                   "run python scripts/generate.py --catalog-only" for path in catalog.stale_outputs(ROOT)]
     for error in errors:
         print(error)
     total = sum(1 for p in files for l in p.read_text(encoding="utf-8").splitlines() if l.startswith("- ["))

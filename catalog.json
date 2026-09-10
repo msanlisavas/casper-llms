@@ -12,6 +12,7 @@
         "fetch": "https://raw.githubusercontent.com/msanlisavas/casper-mcp/main/README.md",
         "cite": "https://github.com/msanlisavas/casper-mcp"
       },
+      "hosting": "self-hosted",
       "transport": ["stdio", "streamable-http"],
       "auth": ["api-key"],
       "pricing": "free",

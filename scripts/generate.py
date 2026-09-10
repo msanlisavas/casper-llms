@@ -31,6 +31,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+import catalog
+
 ROOT = Path(__file__).resolve().parent.parent
 UA = "casper-llms-generator (+https://github.com/msanlisavas/casper-llms)"
 MIN_BYTES = 300  # below this a page is a stub: a title and a link, nothing to answer from
@@ -329,6 +331,14 @@ class ReleaseNotes:
 
 
 @dataclass
+class LocalPage:
+    """A page in this repository, such as directory.md. It is linked without being fetched: its
+    raw URL only exists once the commit that writes it is pushed."""
+    section: str
+    path: str
+
+
+@dataclass
 class Index:
     file: str
     title: str
@@ -336,6 +346,7 @@ class Index:
     collections: list[Collection] = field(default_factory=list)
     pages: list[Page] = field(default_factory=list)
     releases: list[ReleaseNotes] = field(default_factory=list)
+    local: list[LocalPage] = field(default_factory=list)
 
 
 def by_first_dir(strip: str, names: dict[str, str], root: str = "Overview") -> Callable[[str], str]:
@@ -557,7 +568,9 @@ def build_indexes() -> list[Index]:
                 "AI-agent tooling for Casper: the CSPR.cloud, CSPR.click and CSPR.trade agent skills from "
                 "MAKE; the hosted CSPR.cloud and CSPR.trade MCP servers; Odra's Claude Code plugin, whose "
                 "skills and references cover writing, testing and deploying Odra contracts; and casper-mcp, "
-                "an MCP server with 87 tools for querying and building on Casper."),
+                "an MCP server with 87 tools for querying and building on Casper. The Casper AI directory "
+                "lists every capability with its endpoint, authentication and pricing."),
+            local=[LocalPage("Casper AI directory", "directory.md")],
             pages=[
                 Page("MAKE agent skills", "https://cspr.build/cspr-cloud/skill.md", "https://cspr.cloud/skill.md"),
                 # Cited on GitHub, where it renders: the docs.cspr.click install page it used to cite shares
@@ -702,6 +715,10 @@ def generate(index: Index, report: list[str]) -> list[Link]:
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
         links = [link for link in pool.map(lambda j: j[2](), jobs) if link]
+    for page in index.local:
+        text = (ROOT / page.path).read_text(encoding="utf-8")
+        links.append(Link(page.section, title_of(text, page.path, frontmatter(text)),
+                          raw_url(SELF_REPO, SELF_REF, page.path), blob_url(SELF_REPO, SELF_REF, page.path), page.path))
     for notes in index.releases:
         links += mirror_release_notes(notes, report)
         sources.append(f"{notes.repo} releases")
@@ -728,7 +745,24 @@ def generate(index: Index, report: list[str]) -> list[Link]:
     return links
 
 
+def render_catalog() -> int:
+    """Render the root llms.txt, directory.md, the README blocks and the guides index."""
+    errors = catalog.check_all(ROOT)
+    if errors:
+        print("\n".join(errors))
+        return 1
+    for path in catalog.write_all(ROOT):
+        print(f"rendered {path}")
+    return 0
+
+
 def main() -> None:
+    if "--catalog-only" in sys.argv[1:]:
+        sys.exit(render_catalog())
+    # directory.md must exist before the agent-tools index links it; rendering again at the end
+    # carries the regenerated page counts into llms.txt and directory.md.
+    if render_catalog():
+        sys.exit(1)
     summary = []
     for index in build_indexes():
         report: list[str] = []
@@ -738,6 +772,7 @@ def main() -> None:
         print(summary[-1])
         for line in sorted(report):
             print(line)
+    render_catalog()
     print("\n" + "\n".join(summary))
 
 

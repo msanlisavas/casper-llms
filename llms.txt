@@ -1,0 +1,25 @@
+# Casper Network for AI agents
+
+> The starting point for AI agents and LLM tools working with the Casper Network: documentation indexes, guides to what has changed since the 2.0 documentation, and the MCP servers, agent skills, plugins, APIs and SDKs built for agents, from across the ecosystem.
+
+Each link fetches markdown or plain text. The URL after the colon is where a person reads it, followed by a short description.
+Maintained at https://github.com/msanlisavas/casper-llms and generated from its catalog.json.
+
+## Start here
+
+- [Casper AI directory](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/directory.md): https://github.com/msanlisavas/casper-llms/blob/main/directory.md - Every capability listed here, with its endpoint, authentication, pricing, networks and source.
+
+## Documentation indexes
+
+- [Casper Network documentation](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-docs/llms.txt - 221 pages. The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux.
+- [Casper node, sidecar and command-line client](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-node-tools/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-node-tools/llms.txt - 29 pages. Operator and integrator references for the Casper node software.
+- [Casper SDKs](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-sdks/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-sdks/llms.txt - 183 pages. Developer documentation for the Casper SDKs.
+- [Casper token and NFT standard implementations](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-standards/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-standards/llms.txt - 28 pages. Reference implementations and guides for Casper's token standards from the casper-ecosystem organization.
+- [Casper Enhancement Proposals (CEPs)](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-ceps/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-ceps/llms.txt - 45 pages. The Casper Enhancement Proposals from casper-network/ceps.
+- [Odra smart-contract framework](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/odra/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/odra/llms.txt - 53 pages. Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts.
+- [x402 payments on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-x402/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-x402/llms.txt - 21 pages. The x402 pay-per-request protocol on Casper.
+- [Casper agent skills and MCP servers](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-agent-tools/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-agent-tools/llms.txt - 29 pages. AI-agent tooling for Casper.
+
+## MCP servers
+
+- [casper-mcp](https://raw.githubusercontent.com/msanlisavas/casper-mcp/main/README.md): https://github.com/msanlisavas/casper-mcp - Self-hosted MCP server for Casper on-chain data through CSPR.cloud: accounts, blocks, deploys, validators, contracts, tokens and NFTs, with optional locally signed write tools in stdio mode.

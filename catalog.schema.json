@@ -46,6 +46,10 @@
           "required": ["fetch", "cite"],
           "properties": { "fetch": { "$ref": "#/$defs/url" }, "cite": { "$ref": "#/$defs/url" } }
         },
+        "hosting": {
+          "description": "MCP servers: hosted (url is a public endpoint) or self-hosted (url is the project; users run it).",
+          "enum": ["hosted", "self-hosted"]
+        },
         "transport": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["streamable-http", "stdio", "sse"] } },
         "auth": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["none", "api-key", "x402", "oauth"] } },
         "pricing": { "enum": ["free", "paid", "free-and-paid"] },
@@ -57,7 +61,7 @@
         "ours": { "description": "Present, and true, only for capabilities this repository's maintainer publishes.", "const": true }
       },
       "allOf": [
-        { "if": { "required": ["kind"], "properties": { "kind": { "const": "mcp-server" } } }, "then": { "required": ["transport", "auth"] } },
+        { "if": { "required": ["kind"], "properties": { "kind": { "const": "mcp-server" } } }, "then": { "required": ["hosting", "transport", "auth"] } },
         { "if": { "required": ["kind"], "properties": { "kind": { "const": "api" } } }, "then": { "required": ["auth"] } },
         { "if": { "required": ["pricing"], "properties": { "pricing": { "enum": ["paid", "free-and-paid"] } } }, "then": { "required": ["pricingNote"] } }
       ]

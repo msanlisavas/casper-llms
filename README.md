@@ -26,6 +26,20 @@ fetch, grouped into sections.
 Point a tool at the raw file, e.g.
 `https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt`.
 
+## Directory
+
+<!-- catalog:start -->
+| Capability | Kind | Publisher | Access |
+|---|---|---|---|
+| [casper-mcp](directory.md#casper-mcp) | MCP server | msanlisavas | API key; free |
+<!-- catalog:end -->
+
+## Guides
+
+<!-- guides:start -->
+No guides yet.
+<!-- guides:end -->
+
 ## Where a page is fetched vs. where it is cited
 
 Every link fetches raw markdown. The URL after the colon is where the page is published:
