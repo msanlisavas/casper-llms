@@ -1,0 +1,65 @@
+name: check
+
+# Every week: is each catalogued capability still reachable, and was each guide verified against
+# the latest releases? Findings go to ONE tracking issue, which a clean run closes. Nothing in the
+# repository is edited: a person fixes catalog.json or re-verifies the guide.
+on:
+  schedule:
+    - cron: "41 5 * * 1"   # Mondays 05:41 UTC, after the regenerate run
+  workflow_dispatch:
+
+# Least privilege: read-only by default; the one job below may also write issues.
+permissions:
+  contents: read
+
+concurrency:
+  group: check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Probe the catalog and the guides
+        id: probe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          python scripts/check.py --report report.md
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+      - name: Open, update or close the tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS: ${{ steps.probe.outputs.status }}
+        run: |
+          set -euo pipefail
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --label weekly-check --state open \
+            --json number --jq '.[0].number // empty')
+          if [ "$STATUS" = "0" ]; then
+            if [ -n "$number" ]; then
+              gh issue close "$number" --repo "$GITHUB_REPOSITORY" --comment "The latest weekly check found nothing to fix."
+            fi
+            exit 0
+          fi
+          if [ "$STATUS" != "1" ]; then
+            echo "check.py failed with exit status $STATUS"
+            exit 1
+          fi
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --body-file report.md
+          else
+            gh label create weekly-check --repo "$GITHUB_REPOSITORY" --color D93F0B \
+              --description "Found by the weekly catalog and guide check" 2>/dev/null || true
+            gh issue create --repo "$GITHUB_REPOSITORY" --label weekly-check \
+              --title "Weekly check: capabilities to fix or guides to re-verify" --body-file report.md
+          fi
