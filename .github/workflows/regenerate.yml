@@ -1,0 +1,35 @@
+name: regenerate
+
+# New and removed upstream pages only reach the indexes when they are regenerated. Edits to
+# existing pages need nothing: the indexes link branches, so readers always fetch the latest.
+on:
+  schedule:
+    - cron: "17 4 * * 1"   # Mondays 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/generate.py
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "Indexes unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Regenerate indexes from upstream"
+          git push
