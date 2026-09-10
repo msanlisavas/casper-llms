@@ -18,10 +18,16 @@ concurrency:
 jobs:
   regenerate:
     runs-on: ubuntu-latest
+    # main is protected by a ruleset that only the owner and this repository's deploy key may
+    # bypass: a personal repository cannot list the GitHub Actions app as a bypass actor. So the
+    # push goes over SSH with that deploy key (a repository-only credential), and GITHUB_TOKEN
+    # stays read-only - it is used only for the GitHub API calls the generator makes.
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ssh-key: ${{ secrets.REGENERATE_DEPLOY_KEY }}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
