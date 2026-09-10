@@ -565,7 +565,7 @@ def build_indexes() -> list[Index]:
             file="casper-agent-tools/llms.txt",
             title="Casper agent skills and MCP servers",
             summary=(
-                "AI-agent tooling for Casper: the CSPR.cloud, CSPR.click and CSPR.trade agent skills from "
+                "Agent skills, MCP servers and plugins for Casper: the CSPR.cloud, CSPR.click and CSPR.trade agent skills from "
                 "MAKE; the hosted CSPR.cloud and CSPR.trade MCP servers; Odra's Claude Code plugin, whose "
                 "skills and references cover writing, testing and deploying Odra contracts; and casper-mcp, "
                 "an MCP server with 87 tools for querying and building on Casper. The Casper AI directory "

@@ -83,7 +83,7 @@ fetch, grouped into sections.
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | The Casper Enhancement Proposals from casper-network/ceps |
 | [`odra/llms.txt`](odra/llms.txt) | 53 | Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts |
 | [`casper-x402/llms.txt`](casper-x402/llms.txt) | 21 | The x402 pay-per-request protocol on Casper |
-| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 29 | AI-agent tooling for Casper |
+| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 30 | Agent skills, MCP servers and plugins for Casper |
 <!-- indexes:end -->
 
 Point a tool at any raw file, e.g.

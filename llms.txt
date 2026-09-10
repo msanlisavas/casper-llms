@@ -18,7 +18,7 @@ Maintained at https://github.com/msanlisavas/casper-llms and generated from its 
 - [Casper Enhancement Proposals (CEPs)](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-ceps/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-ceps/llms.txt - 45 pages. The Casper Enhancement Proposals from casper-network/ceps.
 - [Odra smart-contract framework](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/odra/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/odra/llms.txt - 53 pages. Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts.
 - [x402 payments on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-x402/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-x402/llms.txt - 21 pages. The x402 pay-per-request protocol on Casper.
-- [Casper agent skills and MCP servers](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-agent-tools/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-agent-tools/llms.txt - 29 pages. AI-agent tooling for Casper.
+- [Casper agent skills and MCP servers](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-agent-tools/llms.txt): https://github.com/msanlisavas/casper-llms/blob/main/casper-agent-tools/llms.txt - 30 pages. Agent skills, MCP servers and plugins for Casper.
 
 ## MCP servers
 
