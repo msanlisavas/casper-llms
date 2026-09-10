@@ -102,6 +102,7 @@ def frontmatter(text: str) -> dict[str, str]:
 
 
 TEMPLATE_SECTIONS = {"summary", "motivation", "abstract"}
+SECTION_WORDS = {"architecture", "overview", "introduction", "usage", "installation", "summary", "contents"}
 
 
 def humanize(name: str) -> str:
@@ -118,10 +119,11 @@ def title_of(text: str, path: str, fm: dict[str, str]) -> str:
     title = fm.get("title")
     body = FRONTMATTER.sub("", text, count=1)
     if not title:
-        # A heading that OPENS the document names it, whatever its level; failing that, the first
+        # A level-1 or level-2 heading that OPENS the document names it; failing that, the first
         # H1, then a setext H1 (a line underlined with ===). Taking the first H1 anywhere titled a
-        # CEP-78 client README after "**Minting**", a section 150 lines in.
-        heading = (re.match(r"(?:[ \t]*\n)*#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", body, re.M)
+        # CEP-78 client README after "**Minting**", a section 150 lines in. Deeper opening headings
+        # are sections, not names: "### What is Condor?" opens an 8-question FAQ.
+        heading = (re.match(r"(?:[ \t]*\n)*#{1,2}[ \t]+(.+?)[ \t]*#*[ \t]*$", body, re.M)
                    or re.search(r"^#[ \t]+(.+?)[ \t]*#*[ \t]*$", body, re.M)
                    or re.search(r"^(\S[^\n]*)\n=+[ \t]*$", body, re.M))
         title = heading.group(1) if heading else None
@@ -134,6 +136,9 @@ def title_of(text: str, path: str, fm: dict[str, str]) -> str:
     # which says nothing to a reader or a search index. Two of Odra's six did.
     if path.endswith("SKILL.md") and fm.get("name") and (not title or clean_title(title).lower() == "skill"):
         title = humanize(fm["name"]) + " skill"
+    # A section word is not a page name: the Go SDK's types/clvalue README opens "## Architecture".
+    if title and clean_title(title).rstrip(":").lower() in SECTION_WORDS:
+        title = None
     if not title:
         stem = path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         parent = path.rsplit("/", 1)[0] if "/" in path else ""
@@ -145,6 +150,21 @@ def title_of(text: str, path: str, fm: dict[str, str]) -> str:
     # The link grammar is  - [title](url)  with no ']' allowed in the title.
     title = clean_title(title).replace("[", "(").replace("]", ")")
     return re.sub(r"\s+", " ", title).strip() or path
+
+
+def npm_publishes(repo: str, ref: str, package_json: str) -> bool:
+    """Whether the npm package a directory documents is published AT THE VERSION it documents.
+
+    The CEP-18, CEP-78 and CEP-85 client READMEs document versions npm does not ship, and two
+    install lines name packages nobody has published - names anyone could claim. An assistant
+    that repeats such a line hands users a typosquatting target. Checked at generation time, so
+    the docs come back on their own once the version is published."""
+    status, _, body = http_get(raw_url(repo, ref, package_json))
+    if status != 200:
+        return False
+    package = json.loads(body)
+    status, _, _ = http_get(f"https://registry.npmjs.org/{package['name']}/{package['version']}")
+    return status == 200
 
 
 def latest_release(repo: str) -> str:
@@ -303,7 +323,9 @@ class ReleaseNotes:
     section: str
     since: str            # oldest tag to mirror, e.g. "v2.0.0"
     folder: str           # where the markdown is written, relative to this repository
-    min_chars: int = 150  # shorter bodies ("Hotfix", links only) are not worth a page
+    # Kept even when tiny: v2.2.2, the release mainnet runs, has only "Security Release" - which
+    # still answers "what is in 2.2.2?", and leaving it out left a silent gap at the newest release.
+    min_chars: int = 1
 
 
 @dataclass
@@ -349,6 +371,9 @@ def build_indexes() -> list[Index]:
     # release exists, KeyManagement comes from the release tag and the CES article is left out.
     # The other articles newer than the tag describe APIs 3.2.0 already has.
     net_ahead_of_release = net_release == "v3.2.0"
+    cep18_client = npm_publishes("casper-ecosystem/cep18", "dev", "client-js/package.json")
+    cep78_client = npm_publishes("casper-ecosystem/cep-78-enhanced-nft", "dev", "client-js/package.json")
+    cep85_client = npm_publishes("casper-ecosystem/cep-85", "dev", "client-js/package.json")
 
     return [
         Index(
@@ -360,7 +385,8 @@ def build_indexes() -> list[Index]:
                 f"unknown path with its HTML homepage. This is documentation version {version_of(v2)}, the "
                 "one the site serves by default, plus its release notes and FAQ. The network has moved on "
                 f"since: casper-node's latest release is {node_release}, and what changed after 2.0 is "
-                "covered by the release notes and changelogs in casper-node-tools/llms.txt."),
+                "covered by the release notes and changelogs in "
+                f"{raw_url(SELF_REPO, SELF_REF, 'casper-node-tools/llms.txt')}."),
             collections=[
                 Collection(docs_redux, "main", rf"^{re.escape(v2)}.+\.mdx?$",
                            by_first_dir(v2, {"concepts": "Concepts", "developers": "Developers",
@@ -379,9 +405,11 @@ def build_indexes() -> list[Index]:
                                       lambda u: "/faq/" in u and "/tags" not in u)),
                 # Only the articles with no newer copy in docs-redux: release notes, local setup, the
                 # JSON-RPC comparison, devnet and transactions (002) were all superseded by condor/.
+                # 039 presents AddressableEntity as Casper 2.0's account model, but mainnet's chainspec
+                # has enable_addressable_entity = false - it would mislead more than it informs.
                 Collection("casper-network/condor-info", "main", r"^(articles|faqs)/[^/]+\.md$",
                            "Casper 2.0 knowledge base (2024)",
-                           exclude=r"^articles/(002|004-local-setup|024-jsonrpc-comp|033-devnet)\.md$"),
+                           exclude=r"^articles/(002|004-local-setup|024-jsonrpc-comp|033-devnet|039-addressable_entity)\.md$"),
             ]),
         Index(
             file="casper-ceps/llms.txt",
@@ -403,11 +431,17 @@ def build_indexes() -> list[Index]:
                 "multi-token, the CEP-95 NFT TypeScript client, and the EIP-712 typed-data toolkit used for "
                 "off-chain signatures and permits. Some tutorials still use casper-client 1.x put-deploy syntax."),
             collections=[
-                Collection("casper-ecosystem/cep18", "dev", r"^(README\.md|docs/.+\.md|client-js/README\.md|contracts/contract/README\.md)$",
+                # Each client-js directory is included only while npm publishes the version it
+                # documents (npm_publishes); today none does, so their install lines stay out.
+                Collection("casper-ecosystem/cep18", "dev",
+                           r"^(README\.md|docs/.+\.md|contracts/contract/README\.md"
+                           + (r"|client-js/README\.md" if cep18_client else "") + r")$",
                            "CEP-18 fungible tokens"),
-                Collection("casper-ecosystem/cep-78-enhanced-nft", "dev", r"^(README\.md|docs/.+\.md|client-js/README\.md)$",
+                Collection("casper-ecosystem/cep-78-enhanced-nft", "dev",
+                           r"^(README\.md|docs/.+\.md" + (r"|client-js/README\.md" if cep78_client else "") + r")$",
                            "CEP-78 enhanced NFTs", exclude=r"CHANGELOG"),
-                Collection("casper-ecosystem/cep-85", "dev", r"^(README\.md|client-js/TUTORIAL\.md|docs/.+\.md|client-js/README\.md)$",
+                Collection("casper-ecosystem/cep-85", "dev",
+                           r"^(README\.md|docs/.+\.md" + (r"|client-js/(README|TUTORIAL)\.md" if cep85_client else "") + r")$",
                            "CEP-85 multi-token", exclude=r"CHANGELOG"),
                 Collection("casper-ecosystem/cep-95-js-client", "main", r"^(README|CHANGELOG)\.md$",
                            "CEP-95 NFTs (TypeScript client)"),
@@ -423,8 +457,8 @@ def build_indexes() -> list[Index]:
             summary=(
                 "Operator and integrator references for the Casper node software: casper-client at v5.0.1 "
                 "(the release CasperAI's commands are pinned to); casper-node at its latest release "
-                f"({node_release}) with its release notes since 2.0 - the only published account of the 2.1 "
-                "and 2.2 protocol changes - and its changelogs; the casper-node-launcher that delivers "
+                f"({node_release}) with its release notes since 2.0 - the fullest account of the 2.1 and "
+                "2.2 protocol changes, since the docs stop at 2.0 - and its changelogs; the casper-node-launcher that delivers "
                 "protocol upgrades; the casper-sidecar JSON-RPC, SSE and REST server; the binary port "
                 "protocol; and the Casper 2.0.0 upgrade notes."),
             collections=[
@@ -453,16 +487,18 @@ def build_indexes() -> list[Index]:
             title="Casper SDKs",
             summary=(
                 "Developer documentation for the Casper SDKs: the JavaScript/TypeScript SDK (per page, plus "
-                "its changelog and guides), the .NET SDK articles and tutorials, the Go SDK and its packages, "
-                "the Rust/WebAssembly SDK with its Python bindings and MCP server, the Java SDK, and the "
-                "Casper Wallet SDK for connecting dApps to the Casper Wallet extension."),
+                "its changelog and guides), the .NET SDK articles, the Go SDK and its packages, the "
+                "Rust/WebAssembly SDK, the Java SDK, and the Casper Wallet SDK for connecting dApps to the "
+                "Casper Wallet extension. Only documentation for released versions is included."),
             collections=[
                 # dev is right here: the GitHub Pages site is published from it.
                 Collection("casper-ecosystem/casper-js-sdk", "dev", r"^site/pages/.+\.mdx$", "JavaScript / TypeScript SDK",
                            vocs("https://casper-ecosystem.github.io/casper-js-sdk", "site/pages/")),
                 Collection("casper-ecosystem/casper-js-sdk", "dev", r"^(CHANGELOG\.md|resources/.+\.md)$",
                            "JavaScript / TypeScript SDK"),
-                Collection(net_sdk, "master", r"^(README\.md|CHANGELOG\.md|Docs/Articles/.+\.md|Docs/Tutorials/.+/README\.md)$",
+                # Docs/Tutorials/ is left out on purpose: its three tutorials still use SDK 2.x APIs
+                # (ExecutionResults, TransformType) that 3.x removed, so their code no longer compiles.
+                Collection(net_sdk, "master", r"^(README\.md|CHANGELOG\.md|Docs/Articles/.+\.md)$",
                            ".NET SDK",
                            exclude=r"^Docs/Articles/(KeyManagement|CasperEventStandard)\.md$" if net_ahead_of_release else None),
                 *([Collection(net_sdk, net_release, r"^Docs/Articles/KeyManagement\.md$", ".NET SDK")]
@@ -470,8 +506,9 @@ def build_indexes() -> list[Index]:
                 Collection("make-software/casper-go-sdk", "master",
                            r"^(README\.md|rpc/README\.md|sse/README(_ADVANCED)?\.md|types/(clvalue|key|keypair)/README\.md)$",
                            "Go SDK"),
-                Collection("casper-ecosystem/casper-rust-wasm-sdk", "dev",
-                           r"^(docs/README\.md|python/README\.md|mcp/(README|TOOLS)\.md)$", "Rust / WebAssembly SDK"),
+                # docs/README.md only: its python/ and mcp/ docs describe packages not yet published
+                # (no PyPI release; the v2.2.2 tag has no python/ folder).
+                Collection("casper-ecosystem/casper-rust-wasm-sdk", "dev", r"^docs/README\.md$", "Rust / WebAssembly SDK"),
                 # The release tag: main still carries the pre-2.0 README; only the release documents
                 # Casper 2.0 support.
                 Collection("casper-network/casper-java-sdk", java_release, r"^README\.md$", f"Java SDK ({java_release})"),
@@ -553,6 +590,30 @@ class Link:
     fetch: str
     cite: str
     sort_key: str
+    repo: str = ""   # set for repository files; used to tell same-titled pages apart
+
+
+def disambiguate(links: list[Link]) -> None:
+    """Give same-titled pages distinct titles: seven casper-node-tools links were all "Changelog".
+    Qualify each with its folder, or with its repository and path when folders collide too."""
+    groups: dict[str, list[Link]] = {}
+    for link in links:
+        groups.setdefault(link.title, []).append(link)
+    for title, group in groups.items():
+        if len(group) < 2:
+            continue
+        def folder(l: Link) -> str:
+            if l.repo:
+                parent = l.sort_key.rsplit("/", 1)[0] if "/" in l.sort_key else ""
+                return parent or l.repo.split("/", 1)[1]
+            return urllib.parse.urlparse(l.fetch).netloc
+        suffixes = [folder(l) for l in group]
+        if len(set(suffixes)) < len(suffixes):
+            suffixes = [f"{l.repo.split('/', 1)[1]}/{l.sort_key.rsplit('.', 1)[0]}" if l.repo else l.fetch for l in group]
+        for link, suffix in zip(group, suffixes):
+            if suffix.lower() == title.lower():   # "casper-node-launcher (casper-node-launcher)"
+                suffix = link.sort_key.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+            link.title = f"{title} ({suffix})"
 
 
 SELF_REPO, SELF_REF = "msanlisavas/casper-llms", "main"
@@ -626,7 +687,7 @@ def generate(index: Index, report: list[str]) -> list[Link]:
                     report.append(f"  no public page found for {coll.repo}/{path}: citing GitHub instead")
                 cite = cite or blob_url(coll.repo, coll.ref, path)
                 section = coll.section(path) if callable(coll.section) else coll.section
-                return Link(section, title, fetch, cite, path)
+                return Link(section, title, fetch, cite, path, coll.repo)
             jobs.append((coll.repo, path, job))
 
     for page in index.pages:
@@ -644,6 +705,7 @@ def generate(index: Index, report: list[str]) -> list[Link]:
     for notes in index.releases:
         links += mirror_release_notes(notes, report)
         sources.append(f"{notes.repo} releases")
+    disambiguate(links)
 
     # Sections keep the order they are first declared in; links sort by path inside a section.
     order: dict[str, int] = {}

@@ -14,11 +14,11 @@ fetch, grouped into sections.
 
 | Index | Pages | Covers |
 |---|---|---|
-| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 222 | docs.casper.network (Casper 2.0), the Condor release notes, the FAQ, and the parts of the 2024 Casper 2.0 knowledge base with no newer copy |
+| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 221 | docs.casper.network (Casper 2.0), the Condor release notes, the FAQ, and the parts of the 2024 Casper 2.0 knowledge base with no newer copy |
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | Casper Enhancement Proposals, including CEP-18, CEP-78, CEP-2612 and CEP-3009 |
-| [`casper-standards/llms.txt`](casper-standards/llms.txt) | 32 | CEP-18, CEP-78 and CEP-85 reference implementations, the CEP-95 NFT client, and EIP-712 typed data on Casper |
-| [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 26 | casper-client v5.0.1, casper-node at its latest release with its changelogs and release notes since 2.0, casper-node-launcher, casper-sidecar, and the 2.0.0 upgrade notes |
-| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 189 | The JavaScript/TypeScript SDK page by page, plus the .NET, Go, Rust/WebAssembly, Java and Casper Wallet SDKs |
+| [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | CEP-18, CEP-78 and CEP-85 reference implementations, the CEP-95 NFT client, and EIP-712 typed data on Casper |
+| [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | casper-client v5.0.1, casper-node at its latest release with its changelogs and release notes since 2.0, casper-node-launcher, casper-sidecar, and the 2.0.0 upgrade notes |
+| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 183 | The JavaScript/TypeScript SDK page by page, plus the .NET, Go, Rust/WebAssembly, Java and Casper Wallet SDKs |
 | [`odra/llms.txt`](odra/llms.txt) | 53 | The Odra smart-contract framework, released version (odra.dev's own llms.txt links only HTML, and two of its links 404) |
 | [`casper-x402/llms.txt`](casper-x402/llms.txt) | 21 | The x402 specification and transports, its Casper scheme, the hosted CSPR.cloud facilitator API, and the Casper facilitator implementation |
 | [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 29 | The CSPR.cloud, CSPR.click and CSPR.trade agent skills, the hosted CSPR.cloud and CSPR.trade MCP servers, Odra's Claude Code plugin (6 skills and 11 references), and casper-mcp |
@@ -49,7 +49,24 @@ casper-node's docs stop at 2.0 and its main changelog at 2.1.2, so the GitHub re
 the only published account of the 2.1 and 2.2 protocol changes. A GitHub release page is HTML an
 ingester cannot read, so the generator mirrors each release's notes into
 [`casper-node-tools/releases/`](casper-node-tools/releases) as markdown, cited at the release
-page. Releases whose notes are only a line or two are skipped.
+page. Even a one-line note is kept: v2.2.2's is just "Security Release", which still answers
+what that release was.
+
+## What is deliberately left out
+
+An LLM repeats what it is given, so these indexes leave out documentation that would make it
+wrong, even when the page is real and published:
+
+- **Unreleased text.** Versioned sites are indexed at the version they serve, and repositories at
+  their latest release where their development branch runs ahead of it.
+- **Client docs for versions npm does not ship.** The CEP-18, CEP-78 and CEP-85 `client-js`
+  docs describe versions that are not published, and two of their install lines name packages
+  nobody has published - names anyone could claim. They are checked against the npm registry on
+  every run and come back automatically once the documented version is published.
+- **Code that no longer compiles.** The .NET SDK tutorials still use 2.x APIs that 3.x removed.
+- **Superseded drafts,** such as pre-release Condor articles and a permits proposal whose API
+  changed before it shipped, and one 2024 article that presents AddressableEntity as Casper 2.0's
+  account model although mainnet disables it.
 
 ## Freshness
 
