@@ -15,9 +15,9 @@ fetch, grouped into sections.
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 30 | CEP-18, CEP-78 and CEP-85 reference implementations, and EIP-712 typed data on Casper |
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 14 | casper-client v5.0.1, casper-sidecar, node changelogs and the 2.0.0 upgrade notes |
 | [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 175 | The JavaScript/TypeScript SDK page by page, plus the .NET, Go, Rust/WebAssembly and Casper Wallet SDKs |
-| [`odra/llms.txt`](odra/llms.txt) | 53 | The Odra smart-contract framework (odra.dev's own llms.txt links only HTML) |
+| [`odra/llms.txt`](odra/llms.txt) | 53 | The Odra smart-contract framework, released version (odra.dev's own llms.txt links only HTML, and two of its links 404) |
 | [`casper-x402/llms.txt`](casper-x402/llms.txt) | 16 | The x402 specification, its Casper scheme, and the Casper facilitator |
-| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 7 | The CSPR.cloud, CSPR.click and CSPR.trade agent skills, and casper-mcp |
+| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 27 | The CSPR.cloud, CSPR.click and CSPR.trade agent skills, Odra's Claude Code plugin (6 skills and 11 references), and casper-mcp |
 
 Point a tool at the raw file, e.g.
 `https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt`.
@@ -42,7 +42,10 @@ repository but are not published on the site, so they cite GitHub.
 ## Freshness
 
 The indexes link branches, not commits, so edits to an existing page reach anything that
-re-reads it. New and removed pages need the indexes regenerated: a
+re-reads it. On a versioned Docusaurus site (docs.casper.network, odra.dev) the generator reads
+the site's own `versions.json` and `lastVersion` and indexes the version the site serves by
+default. The plain `docs/` folder is the unreleased "next" version, and indexing it would put
+unreleased text under the released page's link. New and removed pages need the indexes regenerated: a
 [weekly workflow](.github/workflows/regenerate.yml) does that and commits any change. Each
 index names the upstream commits it was generated from.
 

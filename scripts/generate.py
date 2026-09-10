@@ -107,6 +107,10 @@ def title_of(text: str, path: str, fm: dict[str, str]) -> str:
         body = FRONTMATTER.sub("", text, count=1)
         heading = re.search(r"^#\s+(.+?)\s*#*\s*$", body, re.M)
         title = heading.group(1) if heading else None
+    # Agent skills name themselves in frontmatter; some open with a bare "# Skill" heading,
+    # which says nothing to a reader or a search index. Two of Odra's six did.
+    if path.endswith("SKILL.md") and fm.get("name") and (not title or title.strip().lower() == "skill"):
+        title = re.sub(r"[-_]+", " ", fm["name"]).strip().capitalize() + " skill"
     if not title:
         stem = path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         title = re.sub(r"[-_]+", " ", stem).strip().capitalize()
@@ -127,6 +131,36 @@ def load_sitemap(url: str) -> set[str]:
     # docs.casper.network's sitemap lists http:// URLs; the site itself is served over https.
     return {re.sub(r"^http://", "https://", loc).rstrip("/")
             for loc in re.findall(r"<loc>([^<]+)</loc>", body)}
+
+
+def released_docs_dir(repo: str, ref: str, root: str = "") -> str:
+    """The folder holding the docs version a Docusaurus site serves at its plain URLs.
+
+    On a versioned site the plain docs/ folder is the UNRELEASED "next" version, published
+    under /next/; the released text lives in versioned_docs/. Indexing docs/ while citing the
+    plain URLs means quoting unreleased text under the released page's link. Docusaurus
+    serves versions.json[0] unless docusaurus.config.js sets lastVersion ("current" meaning
+    docs/). Without a versions.json the site is unversioned and docs/ is what it serves."""
+    status, _, config = http_get(raw_url(repo, ref, f"{root}docusaurus.config.js"))
+    # Anchored at line start, so a commented-out  // lastVersion: ...  line is ignored.
+    explicit = re.search(r"^\s*lastVersion:\s*['\"]([^'\"]+)['\"]", config, re.M) if status == 200 else None
+    if explicit:
+        version = explicit.group(1)
+        return f"{root}docs/" if version == "current" else f"{root}versioned_docs/version-{version}/"
+    status, _, body = http_get(raw_url(repo, ref, f"{root}versions.json"))
+    if status != 200:
+        return f"{root}docs/"
+    return f"{root}versioned_docs/version-{json.loads(body)[0]}/"
+
+
+def version_of(docs_dir: str) -> str:
+    match = re.search(r"version-([^/]+)/$", docs_dir)
+    return match.group(1) if match else "next"
+
+
+def not_a_version_path(url: str) -> bool:
+    """Sitemap URLs of the default version only: no /next/ or /<version>/ segment after /docs."""
+    return not re.search(r"/docs/(next|\d[^/]*)(/|$)", url)
 
 
 def strip_number_prefix(segment: str) -> str:
@@ -241,8 +275,10 @@ def build_indexes() -> list[Index]:
     def is_v2_doc(url: str) -> bool:
         return not re.search(r"/(next|1\.5\.X|pages|blog|faq)(/|$)", url)
 
-    v2 = "versioned_docs/version-2.0.0/"
     docs_redux = "casper-network/docs-redux"
+    v2 = released_docs_dir(docs_redux, "main")
+    odra_repo = "odradev/odradev.github.io"
+    odra_docs = released_docs_dir(odra_repo, "master", "docusaurus/")
 
     return [
         Index(
@@ -251,8 +287,8 @@ def build_indexes() -> list[Index]:
             summary=(
                 "The official Casper Network documentation (docs.casper.network), indexed from its source "
                 "repository casper-network/docs-redux: the site publishes no llms.txt and answers every "
-                "unknown path with its HTML homepage. This is the Casper 2.0 (Condor) documentation the "
-                "site serves by default; it has not been updated for Casper 2.1 or 2.2."),
+                f"unknown path with its HTML homepage. This is documentation version {version_of(v2)}, the "
+                "one the site serves by default, plus its release notes and FAQ."),
             collections=[
                 Collection(docs_redux, "main", rf"^{re.escape(v2)}.+\.mdx?$",
                            by_first_dir(v2, {"concepts": "Concepts", "developers": "Developers",
@@ -340,15 +376,15 @@ def build_indexes() -> list[Index]:
             title="Odra smart-contract framework",
             summary=(
                 "Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart "
-                "contracts, indexed from its source (odradev/odradev.github.io): odra.dev's own llms.txt "
-                "links only HTML pages."),
+                f"contracts: version {version_of(odra_docs)}, the release odra.dev serves, indexed from its "
+                "source (odradev/odradev.github.io). odra.dev's own llms.txt links only HTML pages."),
             collections=[
-                Collection("odradev/odradev.github.io", "master", r"^docusaurus/docs/.+\.mdx?$",
-                           by_first_dir("docusaurus/docs/", {"basics": "Basics", "advanced": "Advanced",
-                                                               "tutorials": "Tutorials", "backends": "Backends",
-                                                               "examples": "Examples", "migrations": "Migrations"}),
-                           docusaurus("https://odra.dev", odra_sitemap, "/docs", "docusaurus/docs/",
-                                      lambda u: "/docs/" in u and "/blog/" not in u)),
+                Collection(odra_repo, "master", rf"^{re.escape(odra_docs)}.+\.mdx?$",
+                           by_first_dir(odra_docs, {"basics": "Basics", "advanced": "Advanced",
+                                                    "tutorials": "Tutorials", "backends": "Backends",
+                                                    "examples": "Examples", "migrations": "Migrations"}),
+                           docusaurus("https://odra.dev", odra_sitemap, "/docs", odra_docs,
+                                      lambda u: "/docs" in u and "/blog/" not in u and not_a_version_path(u))),
             ]),
         Index(
             file="casper-x402/llms.txt",
@@ -369,15 +405,19 @@ def build_indexes() -> list[Index]:
             title="Casper agent skills and MCP servers",
             summary=(
                 "AI-agent tooling for Casper: the CSPR.cloud, CSPR.click and CSPR.trade agent skills from "
-                "MAKE, and casper-mcp, an MCP server with 87 tools for querying and building on Casper."),
+                "MAKE; Odra's Claude Code plugin, whose skills and references cover writing, testing and "
+                "deploying Odra contracts; and casper-mcp, an MCP server with 87 tools for querying and "
+                "building on Casper."),
             pages=[
-                Page("Agent skills", "https://cspr.build/cspr-cloud/skill.md", "https://cspr.cloud/skill.md"),
-                Page("Agent skills",
+                Page("MAKE agent skills", "https://cspr.build/cspr-cloud/skill.md", "https://cspr.cloud/skill.md"),
+                Page("MAKE agent skills",
                      "https://raw.githubusercontent.com/make-software/csprclick-examples/master/csprclick-skill/SKILL.md",
                      "https://docs.cspr.click/documentation/ai-agent-skills"),
-                Page("Agent skills", "https://mcp.cspr.trade/SKILL.md", "https://mcp.cspr.trade/SKILL.md"),
+                Page("MAKE agent skills", "https://mcp.cspr.trade/SKILL.md", "https://mcp.cspr.trade/SKILL.md"),
             ],
             collections=[
+                Collection("odradev/odradev-plugins", "main", r"^(README\.md|plugins/odra-plugin/.+\.md)$",
+                           "Odra agent skills (Claude Code plugin)"),
                 Collection("msanlisavas/casper-mcp", "main",
                            r"^(README\.md|CHANGELOG\.md|docs/writes\.md|observability/README\.md)$", "casper-mcp"),
             ]),
