@@ -1,0 +1,10 @@
+# Keeps the SHA-pinned GitHub Actions current. The generator uses only the Python standard
+# library, so there is nothing else to update.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"

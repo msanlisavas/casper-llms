@@ -1,0 +1,35 @@
+name: Suggest a documentation source
+description: Casper documentation that LLM tools should be able to read.
+labels: ["source"]
+body:
+  - type: input
+    id: published
+    attributes:
+      label: Where people read it today
+      description: The published site or page, e.g. https://docs.example.org
+    validations:
+      required: true
+  - type: input
+    id: markdown
+    attributes:
+      label: Where its markdown lives
+      description: The source repository and branch, or a URL that returns the page as plain text or markdown.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Who publishes it
+      options:
+        - Casper Association / core (casper-network, casper-ecosystem)
+        - An ecosystem project (MAKE, Odra, ...)
+        - A community project
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it belongs here
+      description: What questions it answers that the current indexes cannot, and whether it is released or still in development.
+    validations:
+      required: true

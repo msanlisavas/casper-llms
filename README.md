@@ -1,5 +1,9 @@
 # casper-llms
 
+[![validate](https://github.com/msanlisavas/casper-llms/actions/workflows/validate.yml/badge.svg)](https://github.com/msanlisavas/casper-llms/actions/workflows/validate.yml)
+[![regenerate](https://github.com/msanlisavas/casper-llms/actions/workflows/regenerate.yml/badge.svg)](https://github.com/msanlisavas/casper-llms/actions/workflows/regenerate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 [llms.txt](https://llmstxt.org) indexes for Casper Network documentation that has no usable
 llms.txt of its own, so LLM tools can read it.
 
@@ -62,3 +66,18 @@ GITHUB_TOKEN=$(gh auth token) python scripts/generate.py
 Python 3.10+ and nothing else. Every link is fetched during the run: pages that 404, come back
 as HTML, or are stubs under 300 bytes are left out and reported. The set of repositories and
 paths for each index lives in `build_indexes()` in [`scripts/generate.py`](scripts/generate.py).
+
+Then check the result offline with `python scripts/validate.py`, the same check every pull
+request must pass.
+
+## Contributing
+
+Suggestions for new sources and reports of broken or stale links are welcome; see
+[CONTRIBUTING.md](CONTRIBUTING.md). The indexes are generated, so changes go through the
+generator rather than hand edits. Security problems, including a link that leads somewhere
+malicious, go through the [security policy](SECURITY.md).
+
+## License
+
+The generator and the indexes are [MIT](LICENSE). The indexes contain only page titles and
+URLs; the documentation they point at belongs to its publishers and stays under their licenses.

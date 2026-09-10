@@ -7,21 +7,32 @@ on:
     - cron: "17 4 * * 1"   # Mondays 04:17 UTC
   workflow_dispatch:
 
+# Least privilege: read-only by default, write only for the one job that pushes.
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: regenerate
+  cancel-in-progress: false
 
 jobs:
   regenerate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - name: Generate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/generate.py
+      # main is protected and this job is allowed to push to it directly, so nothing it
+      # generates is reviewed first. It must not publish an index that fails validation.
+      - name: Validate
+        run: python scripts/validate.py
       - name: Commit changes
         run: |
           if git diff --quiet; then

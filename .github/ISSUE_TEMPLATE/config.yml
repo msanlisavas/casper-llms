@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/msanlisavas/casper-llms/security/advisories/new
+    about: A link to a hijacked or malicious page, or a problem in the generator or workflows. Please report it privately.

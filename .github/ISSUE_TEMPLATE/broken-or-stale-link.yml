@@ -1,0 +1,44 @@
+name: Report a broken, stale or wrong link
+description: A page that no longer exists, is out of date, or is cited somewhere that shows different content.
+labels: ["link"]
+body:
+  - type: dropdown
+    id: index
+    attributes:
+      label: Index
+      options:
+        - casper-docs
+        - casper-ceps
+        - casper-standards
+        - casper-node-tools
+        - casper-sdks
+        - odra
+        - casper-x402
+        - casper-agent-tools
+    validations:
+      required: true
+  - type: input
+    id: line
+    attributes:
+      label: The link line
+      description: Copy the whole "- [Title](...): ..." line from the index.
+    validations:
+      required: true
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What is wrong
+      options:
+        - The fetched page is gone (404) or is HTML
+        - The citation URL is wrong or shows different content
+        - The page is out of date or from the wrong version
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: What you requested and what came back, and where the correct page is if you know.
+    validations:
+      required: true
