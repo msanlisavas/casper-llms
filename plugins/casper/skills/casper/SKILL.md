@@ -64,7 +64,9 @@ before writing any command. In short:
 
 - Send with `put-transaction` (alias `put-txn`) and its subcommands: `session` takes
   `--wasm-path` and `--install-upgrade`, not the `--transaction-path` and `--category` the docs show.
-- Use `classic` pricing on mainnet and testnet.
+- Use `classic` pricing and `--gas-price-tolerance 1` on mainnet and testnet: a node rejects
+  any other tolerance, and raising it never fixes an out-of-gas failure (raise
+  `--payment-amount`).
 - In 5.0.1, `--transfer-id` makes `put-transaction transfer` panic; when a recipient needs a
   transfer ID, use the legacy `transfer` command.
 - Calling a contract by package name is the `package-name` subcommand.
