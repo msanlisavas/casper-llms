@@ -65,6 +65,26 @@ class ProbeTests(unittest.TestCase):
                            url="https://github.com/example/server", source="https://github.com/example/server")
         self.assertIn("repository is archived", check.probe_entry(self_hosted, get, refuse_post, ok_fetch))
 
+    def test_a_self_hosted_package_without_a_repository_is_checked_on_its_registry(self):
+        seen = []
+        get = lambda url, api=False: (seen.append(url), (200, "", ""))[1]  # noqa: E731
+        package = dict(MCP, hosting="self-hosted", transport=["stdio"], url="https://www.npmjs.com/package/example-mcp")
+        self.assertEqual(check.probe_entry(package, get, refuse_post, ok_fetch), [])
+        self.assertIn("https://registry.npmjs.org/example-mcp", seen)
+        self.assertNotIn("https://www.npmjs.com/package/example-mcp", seen)
+
+    def test_a_skill_repository_is_checked_as_a_repository_not_read_as_markdown(self):
+        skills = dict(MCP, kind="agent-skill", url="https://github.com/example/skills")
+        fetched = []
+
+        def fetch(url):
+            fetched.append(url)
+            return ok_fetch(url)
+
+        get = lambda url, api=False: (200, "", '{"archived": false}')  # noqa: E731
+        self.assertEqual(check.probe_entry(skills, get, refuse_post, fetch), [])
+        self.assertNotIn("https://github.com/example/skills", fetched)
+
     def test_an_api_that_answers_below_500_is_alive(self):
         api = dict(MCP, kind="api", url="https://api.example.org")
         get = lambda url, api=False: (404, "", "") if url == "https://api.example.org" else (200, "", "")  # noqa: E731

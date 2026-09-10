@@ -233,7 +233,9 @@ def has_endpoint(entry: dict) -> bool:
 
 
 def entry_note(entry: dict) -> str:
-    return entry["description"] + (f" Endpoint: {entry['url']}." if has_endpoint(entry) else "")
+    note = entry["description"] + (f" Endpoint: {entry['url']}." if has_endpoint(entry) else "")
+    # An agent reading only the root llms.txt must see the caution too, not just the directory.
+    return note + (f" Caution: {entry['caution']}" if entry.get("caution") else "")
 
 
 def slug(heading: str, used: dict[str, int]) -> str:
@@ -252,7 +254,7 @@ def render_root(entries: list[dict], indexes: list[LocalIndex], guides: list[Gui
                       + [link(g.title, RAW + g.path, BLOB + g.path, g.verified) for g in guides],
         "Documentation indexes": [link(i.title, RAW + i.path, BLOB + i.path, f"{pages(i.pages)}. {lead(i.summary)}")
                                   for i in indexes]
-                                 + [link(e["name"], e["docs"]["fetch"], e["docs"]["cite"], e["description"])
+                                 + [link(e["name"], e["docs"]["fetch"], e["docs"]["cite"], entry_note(e))
                                     for e in by_kind(entries, "llms-txt")],
     }
     for kind, (heading, _) in KINDS.items():
@@ -313,6 +315,9 @@ def render_directory(entries: list[dict], indexes: list[LocalIndex]) -> tuple[st
         "servers, agent skills, plugins, APIs and SDKs, from across the ecosystem. It is generated from "
         f"{BLOB}catalog.json, and a weekly check confirms that each endpoint still answers and each entry's "
         f"documentation is still readable. To list a capability, see {BLOB}CONTRIBUTING.md.", "",
+        "Listing is not an endorsement or a security audit. Entries are checked against the listing rules and "
+        "probed weekly; their code is not reviewed. Many are early projects that run only on testnet. Read an "
+        "entry's caution and its source before giving it funds or keys.", "",
         "Entries marked \"maintained here\" are published by this repository's maintainer.", "",
     ]
     for kind, (title, _) in KINDS.items():
@@ -329,6 +334,8 @@ def render_directory(entries: list[dict], indexes: list[LocalIndex]) -> tuple[st
         for entry in group:
             heading(3, entry["name"], entry["id"])
             lines += [entry["description"], ""]
+            if entry.get("caution"):
+                lines += [f"**Caution:** {entry['caution']}", ""]
             lines += [f"- **{label}:** {value}" for label, value in fields(entry)]
             lines.append("")
     return "\n".join(lines).rstrip("\n") + "\n", anchors

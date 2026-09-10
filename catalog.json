@@ -2,25 +2,1130 @@
   "$schema": "./catalog.schema.json",
   "capabilities": [
     {
+      "id": "astralbeam-llms-txt",
+      "name": "AstralBeam docs llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "llms.txt of the AstralBeam docs, MAKE's Casper-EVM token bridge (live on testnets, mainnet not launched): guides, security model, REST API, contracts, relayers. Also searchable through GitBook's MCP server at https://docs.astralbeam.io/~gitbook/mcp.",
+      "url": "https://docs.astralbeam.io/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://docs.astralbeam.io/llms.txt",
+        "cite": "https://docs.astralbeam.io/"
+      }
+    },
+    {
+      "id": "casper-js-sdk-llms-txt",
+      "name": "Casper JS SDK llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "Casper Ecosystem",
+        "url": "https://github.com/casper-ecosystem"
+      },
+      "description": "llms.txt and llms-full.txt for the Casper JS SDK (TypeScript) documentation site, covering RPC actions, types, CLValues, builders, clients, SSE and utilities. Links in llms.txt point at HTML pages; llms-full.txt carries the full text.",
+      "url": "https://casper-ecosystem.github.io/casper-js-sdk/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://casper-ecosystem.github.io/casper-js-sdk/llms.txt",
+        "cite": "https://casper-ecosystem.github.io/casper-js-sdk/"
+      },
+      "source": "https://github.com/casper-ecosystem/casper-js-sdk",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "cspr-click-llms-txt",
+      "name": "CSPR.click docs llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "GitBook llms.txt of the CSPR.click Web SDK docs (integration guides, SDK reference, AI agent skills), linking every page as markdown, plus v1.10-v1.12. Also searchable through GitBook's MCP server at https://docs.cspr.click/~gitbook/mcp.",
+      "url": "https://docs.cspr.click/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://docs.cspr.click/llms.txt",
+        "cite": "https://docs.cspr.click/"
+      }
+    },
+    {
+      "id": "cspr-cloud-llms-txt",
+      "name": "CSPR.cloud docs llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "GitBook llms.txt of the CSPR.cloud docs (REST, Streaming and Node APIs, x402 facilitator, AI skill, MCP server), linking every page as markdown, plus older 1.0.x-1.5.x versions. Also searchable through GitBook's MCP server at https://docs.cspr.cloud/~gitbook/mcp.",
+      "url": "https://docs.cspr.cloud/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://docs.cspr.cloud/llms.txt",
+        "cite": "https://docs.cspr.cloud/"
+      }
+    },
+    {
+      "id": "cspr-market-llms-txt",
+      "name": "CSPR.market docs llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "GitBook-generated llms.txt index of the CSPR.market NFT marketplace user documentation (buying, selling, creating and publishing collections), linking six Markdown pages; llms-full.txt carries the full text.",
+      "url": "https://docs.cspr.market/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://docs.cspr.market/llms.txt",
+        "cite": "https://docs.cspr.market/"
+      }
+    },
+    {
+      "id": "odra-llms-txt",
+      "name": "Odra framework llms.txt",
+      "kind": "llms-txt",
+      "publisher": {
+        "name": "Odra.dev",
+        "url": "https://odra.dev"
+      },
+      "description": "Odra's own llms.txt for its Rust smart-contract framework docs: getting started, basics, advanced topics, backends, tutorials and migrations. Its links point at HTML pages; this repository's Odra index links the same docs as markdown.",
+      "url": "https://odra.dev/llms.txt",
+      "pricing": "free",
+      "docs": {
+        "fetch": "https://odra.dev/llms.txt",
+        "cite": "https://odra.dev/docs/"
+      },
+      "source": "https://github.com/odradev/odradev.github.io",
+      "license": "MIT"
+    },
+    {
+      "id": "agentgate",
+      "name": "AgentGate",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "mdlog",
+        "url": "https://github.com/mdlog"
+      },
+      "description": "CLI and stdio MCP server for x402 paid APIs on Casper testnet: discover services in an on-chain registry, fetch 402 invoices and pay them in native CSPR or in WCSPR via the CSPR.cloud facilitator; sellers wrap an HTTP API with one command. Signs locally with a PEM key.",
+      "url": "https://www.npmjs.com/package/@mdlog/agentgate",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/mdlog/AgentGate/main/README.md",
+        "cite": "https://github.com/mdlog/AgentGate"
+      },
+      "source": "https://github.com/mdlog/AgentGate",
+      "license": "MIT",
+      "install": "npx -y @mdlog/agentgate mcp"
+    },
+    {
+      "id": "agentpay-trust-pass",
+      "name": "AgentPay (Casper x402 charge checker)",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Timidan",
+        "url": "https://github.com/Timidan"
+      },
+      "description": "Stdio MCP server and CLI that check a Casper x402 charge before the buyer signs (PAY, REVIEW or BLOCK), verify the settled transaction against the approved terms, and issue verifiable receipts. Also sells token and account evidence reports over x402. Buyer keys stay local.",
+      "url": "https://www.npmjs.com/package/@timidan/agentpay-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none",
+        "api-key",
+        "x402"
+      ],
+      "pricing": "free-and-paid",
+      "pricingNote": "Quote, payment-status and proof tools are free. Protected tools need a scoped AgentPay token; evidence reports are paid over x402 in testnet WCSPR (0.00001 per report on 2026-09-10).",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Timidan/agentpay-trust-pass/main/README.md",
+        "cite": "https://github.com/Timidan/agentpay-trust-pass"
+      },
+      "source": "https://github.com/Timidan/agentpay-trust-pass",
+      "license": "MIT",
+      "install": "npx --yes @timidan/agentpay-mcp"
+    },
+    {
+      "id": "casper-mcp-python",
+      "name": "Casper MCP Python Server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Jiu-hong",
+        "url": "https://github.com/Jiu-hong"
+      },
+      "description": "Python stdio MCP server for Casper aimed at GitHub Copilot Chat: node, block, era, auction, deploy and account queries plus native transfers, WASM deploys and contract calls signed locally from a secret_key.pem path. Targets testnet, mainnet or a local NCTL node.",
+      "url": "https://github.com/Jiu-hong/casper-mcp-python",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Jiu-hong/casper-mcp-python/main/README.md",
+        "cite": "https://github.com/Jiu-hong/casper-mcp-python"
+      },
+      "source": "https://github.com/Jiu-hong/casper-mcp-python"
+    },
+    {
+      "id": "tairon-casper-network-mcp",
+      "name": "Casper Network MCP Server (Tairon.ai)",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Tairon.ai",
+        "url": "https://github.com/Tairon-ai"
+      },
+      "description": "Node.js stdio MCP server for Casper with 8 tools: wallet creation, balance, account, staking and validator queries, CSPR transfers, delegation and undelegation. Signs locally with a PEM key from env or passed as a tool argument; defaults to mainnet via CSPR.cloud RPC (API key needed).",
+      "url": "https://github.com/Tairon-ai/casper-network-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Tairon-ai/casper-network-mcp/main/README.md",
+        "cite": "https://github.com/Tairon-ai/casper-network-mcp"
+      },
+      "source": "https://github.com/Tairon-ai/casper-network-mcp",
+      "license": "MIT",
+      "caution": "Its signing tools accept a PEM key as a tool argument, which puts the key in the model's context; give it the key through the environment instead."
+    },
+    {
       "id": "casper-mcp",
       "name": "casper-mcp",
       "kind": "mcp-server",
-      "publisher": { "name": "msanlisavas", "url": "https://github.com/msanlisavas" },
-      "description": "Self-hosted MCP server for Casper on-chain data through CSPR.cloud: accounts, blocks, deploys, validators, contracts, tokens and NFTs, with optional locally signed write tools in stdio mode.",
+      "publisher": {
+        "name": "msanlisavas",
+        "url": "https://github.com/msanlisavas"
+      },
+      "description": "Open-source .NET 10 MCP server with 82 Casper Network tools backed by the CSPR.cloud API (queries plus multi-sig awaiting-deploy submission) and 5 opt-in write tools that sign locally, stdio only. Runs over stdio or stateless Streamable HTTP; needs a CSPR.cloud API key.",
       "url": "https://github.com/msanlisavas/casper-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio",
+        "streamable-http"
+      ],
+      "auth": [
+        "api-key"
+      ],
+      "pricing": "free",
+      "pricingNote": "The software is free (MIT). Every call needs a CSPR.cloud API key; CSPR.cloud plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
       "docs": {
         "fetch": "https://raw.githubusercontent.com/msanlisavas/casper-mcp/main/README.md",
         "cite": "https://github.com/msanlisavas/casper-mcp"
       },
-      "hosting": "self-hosted",
-      "transport": ["stdio", "streamable-http"],
-      "auth": ["api-key"],
-      "pricing": "free",
-      "networks": ["casper:casper", "casper:casper-test"],
       "source": "https://github.com/msanlisavas/casper-mcp",
       "license": "MIT",
       "install": "docker run -i ghcr.io/msanlisavas/casper-mcp:latest --api-key <CSPR-CLOUD-API-KEY>",
       "ours": true
+    },
+    {
+      "id": "casper-mcp-py",
+      "name": "casper-mcp-py",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Tmalone1250",
+        "url": "https://github.com/Tmalone1250"
+      },
+      "description": "Python port of casper-mcp: a stdio MCP server with 80+ query tools over the CSPR.cloud REST API (mainnet or testnet, API key needed). Opt-in write tools (--enable-writes plus a local PEM key file) build testnet transfer and staking transactions; only two native-transfer tools broadcast.",
+      "url": "https://github.com/Tmalone1250/casper-mcp-py",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Tmalone1250/casper-mcp-py/main/README.md",
+        "cite": "https://github.com/Tmalone1250/casper-mcp-py"
+      },
+      "source": "https://github.com/Tmalone1250/casper-mcp-py"
+    },
+    {
+      "id": "casper-rust-wasm-sdk-mcp",
+      "name": "casper-rust-wasm-sdk MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Interchouette - ITC",
+        "url": "https://interchouette.net"
+      },
+      "description": "Rust MCP server over casper-rust-wasm-sdk: node JSON-RPC and binary-port reads, transaction/deploy builders, speculative execution, contract queries and SSE tools, plus sign/submit tools that take a secret key PEM as a tool argument and sign in the self-hosted process. stdio or Streamable HTTP.",
+      "url": "https://hub.docker.com/r/interchouette/casper-rust-wasm-sdk-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio",
+        "streamable-http"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/mcp/README.md",
+        "cite": "https://github.com/casper-ecosystem/casper-rust-wasm-sdk/tree/dev/mcp"
+      },
+      "source": "https://github.com/casper-ecosystem/casper-rust-wasm-sdk",
+      "license": "Apache-2.0",
+      "caution": "Its sign and submit tools take a secret key PEM as a tool argument, which puts the key in the model's context; use the read and unsigned-builder tools, or sign elsewhere."
+    },
+    {
+      "id": "casperai-mcp",
+      "name": "CasperAI MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "msanlisavas",
+        "url": "https://github.com/msanlisavas"
+      },
+      "description": "Hosted MCP server with two tools: casper_ask returns a verified, cited answer about Casper from its docs and live chain data, and casper_command_build builds casper-client 5.0.1 commands as text, never touching keys.",
+      "url": "https://casperai.ekolsoft.com/v1/mcp",
+      "hosting": "hosted",
+      "transport": [
+        "streamable-http"
+      ],
+      "auth": [
+        "none",
+        "api-key",
+        "x402"
+      ],
+      "pricing": "free-and-paid",
+      "pricingNote": "casper_command_build is free with no key. casper_ask is charged per delivered answer from a prepaid API key or by x402; refusals are never charged.",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://casperai.ekolsoft.com/docs/api.md",
+        "cite": "https://casperai.ekolsoft.com/docs/api.md"
+      },
+      "ours": true
+    },
+    {
+      "id": "casperflow-mcp",
+      "name": "CasperFlow MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "emmgr23",
+        "url": "https://github.com/emmgr23"
+      },
+      "description": "npm stdio MCP server from the CasperFlow agent builder: account info, CSPR balances, CSPR.name resolution, native CSPR transfers, delegation, and EIP-712 attestations anchored by a self-transfer. Signs locally with a hex secret key from env; testnet by default, mainnet optional.",
+      "url": "https://www.npmjs.com/package/casperflow-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/emmgr23/CasperFlow/main/mcp-server/README.md",
+        "cite": "https://github.com/emmgr23/CasperFlow/tree/main/mcp-server"
+      },
+      "source": "https://github.com/emmgr23/CasperFlow",
+      "install": "npx -y casperflow-mcp"
+    },
+    {
+      "id": "ceps-rust-ts-client-mcp",
+      "name": "ceps-rust-ts-client MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Interchouette ITC",
+        "url": "https://github.com/Interchouette-ITC"
+      },
+      "description": "Self-hosted Rust MCP server (128 tools, stdio or Streamable HTTP) to install, query and mutate CEP-18, CEP-78, CEP-85 and CEP-95 contracts on a Casper node you configure (defaults to local NCTL). Write tools return unsigned transactions or sign in-process with a PEM passed as a tool argument.",
+      "url": "https://hub.docker.com/r/interchouette/ceps-rust-ts-client-mcp",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio",
+        "streamable-http"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Interchouette-ITC/ceps-rust-ts-client/dev/mcp/README.md",
+        "cite": "https://github.com/Interchouette-ITC/ceps-rust-ts-client/tree/dev/mcp"
+      },
+      "source": "https://github.com/Interchouette-ITC/ceps-rust-ts-client",
+      "license": "GPL-3.0",
+      "install": "docker pull interchouette/ceps-rust-ts-client-mcp:dev",
+      "caution": "Its write tools can sign in-process with a PEM passed as a tool argument, which puts the key in the model's context; use the unsigned-transaction mode instead."
+    },
+    {
+      "id": "cspr-ai-mcp",
+      "name": "CSPR.AI MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Blockchain-Oracle",
+        "url": "https://github.com/Blockchain-Oracle"
+      },
+      "description": "Self-hosted TypeScript MCP server (33 tools, stdio or Streamable HTTP) for Casper: balance, validator, staking and deploy queries, plus unsigned transaction builders for transfers, delegation, CEP-18/CEP-78 tokens and its own DAO/DEX contracts. Signing via CSPR.click, or an env key in stdio mode.",
+      "url": "https://github.com/Blockchain-Oracle/cspr-ai",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio",
+        "streamable-http"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Blockchain-Oracle/cspr-ai/master/mcp-server/README.md",
+        "cite": "https://github.com/Blockchain-Oracle/cspr-ai/tree/master/mcp-server"
+      },
+      "source": "https://github.com/Blockchain-Oracle/cspr-ai",
+      "license": "MIT"
+    },
+    {
+      "id": "cspr-cloud-mcp",
+      "name": "CSPR.cloud MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "Hosted MCP server from CSPR.cloud that gives agents indexed Casper data: accounts, blocks, deploys, validators, contracts, tokens, NFTs and network status. Separate mainnet and testnet endpoints; based on the open-source casper-mcp.",
+      "url": "https://mcp.cspr.cloud/mcp",
+      "hosting": "hosted",
+      "transport": [
+        "streamable-http"
+      ],
+      "auth": [
+        "api-key"
+      ],
+      "pricing": "free-and-paid",
+      "pricingNote": "Calls count against the caller's CSPR.cloud plan: Free $0/mo (100,000 API requests a month), Pro $199/mo (400,000), Custom on request (cspr.build/pricing).",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://docs.cspr.cloud/agentic-tools/mcp-server.md?displayAgentInstructions=false",
+        "cite": "https://docs.cspr.cloud/agentic-tools/mcp-server"
+      }
+    },
+    {
+      "id": "cspr-trade-mcp",
+      "name": "CSPR.trade MCP server",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "MCP server for the CSPR.trade DEX: 23 tools for market data, price history, quotes, trade analysis, LP positions, building unsigned swap/liquidity deploys and submitting signed ones. The public mainnet endpoint needs no key; the npm package self-hosts (incl. testnet) with an optional local signer.",
+      "url": "https://mcp.cspr.trade/mcp",
+      "hosting": "hosted",
+      "transport": [
+        "streamable-http",
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://mcp.cspr.trade/llms.txt",
+        "cite": "https://mcp.cspr.trade/docs/mcp"
+      },
+      "source": "https://github.com/make-software/cspr-trade-mcp",
+      "license": "MIT",
+      "install": "npm install @make-software/cspr-trade-mcp"
+    },
+    {
+      "id": "mr-mainspring",
+      "name": "Mr Mainspring",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Micoh18",
+        "url": "https://github.com/Micoh18"
+      },
+      "description": "Stdio MCP server that gives agents hashed, verifiable memory, an encrypted local secret store, policy-gated x402 payments with redacted receipts, audit events, and optional hash-only anchoring on Casper testnet. Payments and anchors sign with a local Casper key.",
+      "url": "https://www.npmjs.com/package/mrmainspring",
+      "hosting": "self-hosted",
+      "transport": [
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Micoh18/Mr-Mainspring/main/README.md",
+        "cite": "https://github.com/Micoh18/Mr-Mainspring"
+      },
+      "source": "https://github.com/Micoh18/Mr-Mainspring",
+      "license": "MIT",
+      "install": "npx -y mrmainspring setup"
+    },
+    {
+      "id": "sluice-casper-events",
+      "name": "Sluice",
+      "kind": "mcp-server",
+      "publisher": {
+        "name": "Unity Nodes",
+        "url": "https://github.com/UnityNodes"
+      },
+      "description": "Push-based on-chain event service for Casper testnet: JSON-predicate subscriptions deliver matching events to a webhook or to an AI agent via MCP. The hosted MCP has read-only delivery-feed tools; subscribe and cancel run in a local stdio server that signs with your own key.",
+      "url": "https://sluice.unitynodes.com/mcp",
+      "hosting": "hosted",
+      "transport": [
+        "streamable-http",
+        "stdio"
+      ],
+      "auth": [
+        "none"
+      ],
+      "pricing": "free-and-paid",
+      "pricingNote": "The hosted MCP tools are free with no account. Subscriptions prepay CSPR into an on-chain escrow; each webhook delivery costs 1 CSPR, the rest is refunded on cancel. Testnet only.",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/UnityNodes/Sluice/main/README.md",
+        "cite": "https://github.com/UnityNodes/Sluice"
+      },
+      "source": "https://github.com/UnityNodes/Sluice",
+      "license": "MIT",
+      "install": "claude mcp add --transport http sluice https://sluice.unitynodes.com/mcp"
+    },
+    {
+      "id": "casper-testnet-deploy-skill",
+      "name": "Casper testnet deploy skill (casper-js-sdk)",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "TerexitariusStomp",
+        "url": "https://github.com/TerexitariusStomp"
+      },
+      "description": "Agent skill for deploying Rust smart contracts to Casper testnet (protocol 2.0+) with casper-js-sdk v5 and raw-RPC fallbacks: bulk-memory-free WASM builds, deploy construction with local PEM signing, contract-hash retrieval, CLValue reference and known SDK pitfalls.",
+      "url": "https://raw.githubusercontent.com/TerexitariusStomp/casper-testnet-deploy/main/SKILL.md",
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/TerexitariusStomp/casper-testnet-deploy/main/SKILL.md",
+        "cite": "https://github.com/TerexitariusStomp/casper-testnet-deploy"
+      },
+      "source": "https://github.com/TerexitariusStomp/casper-testnet-deploy",
+      "license": "MIT",
+      "install": "npx skills add TerexitariusStomp/casper-testnet-deploy --skill casper-testnet-deploy"
+    },
+    {
+      "id": "cspr-click-skill",
+      "name": "CSPR.click SDK integration skill",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "Agent skill for integrating the CSPR.click Web SDK into Casper dApps: wallet connection, transaction and message signing through the user's wallet, events, theming and CSPR.cloud proxies, for React, Next.js and vanilla JS.",
+      "url": "https://raw.githubusercontent.com/make-software/csprclick-examples/master/csprclick-skill/SKILL.md",
+      "pricing": "free",
+      "pricingNote": "The skill is free. Production CSPR.click apps need an appId from console.cspr.build; CSPR.click plans are Free up to 1,000 monthly active wallets, Pro $99/mo, Custom.",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://docs.cspr.click/documentation/ai-agent-skills.md?displayAgentInstructions=false",
+        "cite": "https://docs.cspr.click/documentation/ai-agent-skills"
+      },
+      "source": "https://github.com/make-software/csprclick-examples/tree/master/csprclick-skill",
+      "license": "Apache-2.0",
+      "install": "npx skills add https://github.com/make-software/csprclick-examples/tree/master/csprclick-skill"
+    },
+    {
+      "id": "cspr-cloud-skill",
+      "name": "CSPR.cloud AI skill",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "Agent skill (SKILL.md) that teaches coding agents CSPR.cloud REST, Streaming and Casper Node proxy conventions (auth, pagination, includes, errors) and points them to the relevant docs pages instead of copying the API reference.",
+      "url": "https://cspr.cloud/skill.md",
+      "pricing": "free",
+      "pricingNote": "The skill is free. The APIs it targets need a CSPR.cloud access token: Free $0/mo, Pro $199/mo, Custom (https://cspr.build/pricing/).",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://docs.cspr.cloud/agentic-tools/ai-skill.md?displayAgentInstructions=false",
+        "cite": "https://docs.cspr.cloud/agentic-tools/ai-skill"
+      }
+    },
+    {
+      "id": "cspr-trade-skill",
+      "name": "CSPR.trade DEX assistant skill",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "Agent skill (SKILL.md) that walks agents through CSPR.trade DEX workflows with the cspr-trade MCP tools: quote before swap, price-impact and slippage checks, liquidity, portfolio and history queries, and signing through an optional local signer.",
+      "url": "https://mcp.cspr.trade/SKILL.md",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/make-software/cspr-trade-mcp/master/docs/SKILL.md",
+        "cite": "https://mcp.cspr.trade/"
+      },
+      "source": "https://github.com/make-software/cspr-trade-mcp",
+      "license": "MIT"
+    },
+    {
+      "id": "fund402-agent-skills",
+      "name": "Fund402 agent skills",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "nickthelegend",
+        "url": "https://github.com/nickthelegend"
+      },
+      "description": "Agent Skills that teach a coding agent to use Fund402 on Casper testnet: pay x402 endpoints with just-in-time pool credit, repay loans, provide liquidity, stand up a pool-settled paywall, run operator wallet tasks, and buy through Clawback escrow with AI-adjudicated disputes.",
+      "url": "https://github.com/nickthelegend/fund402-agent-skills",
+      "pricing": "free-and-paid",
+      "pricingNote": "The skills are free. Borrowing through the Fund402 vault carries a 5% credit fee per loan, and Tier-1/2 agents post 150% collateral. Testnet F402 token only.",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/nickthelegend/fund402-agent-skills/main/README.md",
+        "cite": "https://github.com/nickthelegend/fund402-agent-skills"
+      },
+      "source": "https://github.com/nickthelegend/fund402-agent-skills",
+      "license": "MIT",
+      "install": "npx skills add nickthelegend/fund402-agent-skills"
+    },
+    {
+      "id": "odra-casper-testnet-deploy-skill",
+      "name": "Odra Casper testnet deploy skill",
+      "kind": "agent-skill",
+      "publisher": {
+        "name": "t9fiction",
+        "url": "https://github.com/t9fiction"
+      },
+      "description": "Agent skill for deploying Odra contracts to Casper testnet with casper-client: cargo odra build, put-transaction session install with Odra's required named args, entry-point calls, contract-hash lookup and error-code troubleshooting. Signs locally with a PEM key file.",
+      "url": "https://raw.githubusercontent.com/t9fiction/casper-odra-testnet-deploy-skill/main/skills/odra-casper-testnet-deploy/SKILL.md",
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/t9fiction/casper-odra-testnet-deploy-skill/main/skills/odra-casper-testnet-deploy/SKILL.md",
+        "cite": "https://github.com/t9fiction/casper-odra-testnet-deploy-skill"
+      },
+      "source": "https://github.com/t9fiction/casper-odra-testnet-deploy-skill",
+      "install": "npx skills add t9fiction/casper-odra-testnet-deploy-skill --skill odra-casper-testnet-deploy"
+    },
+    {
+      "id": "elizaos-plugin-casper",
+      "name": "Casper plugin for ElizaOS",
+      "kind": "plugin",
+      "publisher": {
+        "name": "xinminsu",
+        "url": "https://github.com/xinminsu"
+      },
+      "description": "ElizaOS plugin for Casper with 14 actions: wallet generation, CSPR balance and transfers, network, account, contract, dictionary, CEP-18/47/78 token and staking queries and writes, signed locally with a key from agent settings; testnet by default, mainnet by config.",
+      "url": "https://www.npmjs.com/package/@suxinmin/plugin-casper",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/xinminsu/plugin-casper/main/README.md",
+        "cite": "https://github.com/xinminsu/plugin-casper"
+      },
+      "source": "https://github.com/xinminsu/plugin-casper",
+      "license": "MIT"
+    },
+    {
+      "id": "hermes-plugin-casper",
+      "name": "Casper plugin for Hermes Agent",
+      "kind": "plugin",
+      "publisher": {
+        "name": "xinminsu",
+        "url": "https://github.com/xinminsu"
+      },
+      "description": "Hermes Agent plugin for Casper with 16 tools: network, account, token, staking and DApp reads over JSON-RPC, local alerts, wallet generation, and CSPR, token, NFT, staking and DeFi writes signed locally by a bundled casper-js-sdk runner; testnet by default, mainnet via env.",
+      "url": "https://github.com/xinminsu/plugin-casper-hermes",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/xinminsu/plugin-casper-hermes/main/README.md",
+        "cite": "https://github.com/xinminsu/plugin-casper-hermes"
+      },
+      "source": "https://github.com/xinminsu/plugin-casper-hermes",
+      "license": "MIT"
+    },
+    {
+      "id": "openclaw-plugin-casper",
+      "name": "Casper plugin for OpenClaw",
+      "kind": "plugin",
+      "publisher": {
+        "name": "xinminsu",
+        "url": "https://github.com/xinminsu"
+      },
+      "description": "OpenClaw plugin for Casper with 32 tools (23 read-only; 9 optional: CSPR, CEP-18 and NFT transfers, delegation, contract calls, local alert edits) and two bundled skills; signs locally with a key from plugin config; mainnet by default, testnet by config.",
+      "url": "https://www.npmjs.com/package/openclaw-plugin-casper",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/xinminsu/plugin-casper-openclaw/main/README.md",
+        "cite": "https://github.com/xinminsu/plugin-casper-openclaw"
+      },
+      "source": "https://github.com/xinminsu/plugin-casper-openclaw",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "odra-claude-plugin",
+      "name": "Odra Claude Code plugin (odradev-plugins)",
+      "kind": "plugin",
+      "publisher": {
+        "name": "Odra.dev",
+        "url": "https://odra.dev"
+      },
+      "description": "Claude Code plugin marketplace with odra-plugin: skills to check the toolchain, scaffold Odra projects, write and test contracts, run a local NCTL node, and deploy to nctl, testnet or mainnet with a locally stored key.",
+      "url": "https://github.com/odradev/odradev-plugins",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/odradev/odradev-plugins/main/README.md",
+        "cite": "https://github.com/odradev/odradev-plugins"
+      },
+      "source": "https://github.com/odradev/odradev-plugins",
+      "license": "MIT",
+      "install": "/plugin marketplace add odradev/odradev-plugins"
+    },
+    {
+      "id": "casperai-api",
+      "name": "CasperAI API",
+      "kind": "api",
+      "publisher": {
+        "name": "msanlisavas",
+        "url": "https://github.com/msanlisavas"
+      },
+      "description": "HTTP API that streams a verified, cited answer about the Casper Network as Server-Sent Events (POST /v1/chat), paid with a prepaid API key or x402 per query. The same engine runs the CasperAI web chat.",
+      "url": "https://casperai.ekolsoft.com/v1/chat",
+      "auth": [
+        "api-key",
+        "x402"
+      ],
+      "pricing": "paid",
+      "pricingNote": "Charged per delivered answer from a prepaid API key, or by x402 on Casper mainnet; refusals are never charged.",
+      "networks": [
+        "casper:casper"
+      ],
+      "docs": {
+        "fetch": "https://casperai.ekolsoft.com/llms.txt",
+        "cite": "https://casperai.ekolsoft.com"
+      },
+      "ours": true
+    },
+    {
+      "id": "cspr-cloud-x402-facilitator",
+      "name": "CSPR.cloud x402 facilitator",
+      "kind": "api",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "Hosted x402 facilitator from CSPR.cloud that verifies and settles x402 v2 'exact' payments (EIP-712-signed CEP-18 transfer_with_authorization) on Casper mainnet and testnet via /supported, /verify and /settle; needs a CSPR.cloud access token.",
+      "url": "https://x402-facilitator.cspr.cloud",
+      "auth": [
+        "api-key"
+      ],
+      "pricing": "free-and-paid",
+      "pricingNote": "Settlements count against the caller's CSPR.cloud plan: Free includes 25 mainnet and 1,000 testnet settlements a month, Pro ($199/mo) 2,500 and 10,000 (cspr.build/pricing).",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://docs.cspr.cloud/x402-facilitator-api/reference.md?displayAgentInstructions=false",
+        "cite": "https://docs.cspr.cloud/x402-facilitator-api/reference"
+      }
+    },
+    {
+      "id": "magen3",
+      "name": "Magen3 Agent Gateway",
+      "kind": "api",
+      "publisher": {
+        "name": "zicjoe",
+        "url": "https://github.com/zicjoe"
+      },
+      "description": "Pre-execution firewall API for autonomous agents: an agent submits a transaction intent and gets Allowed, Blocked or Review Required from deterministic policy checks, with decisions recorded as proofs on Casper Testnet. It does not take user keys or sign user transactions.",
+      "url": "https://magen3-production.up.railway.app",
+      "auth": [
+        "api-key"
+      ],
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/zicjoe/magen3/main/README.md",
+        "cite": "https://github.com/zicjoe/magen3"
+      },
+      "source": "https://github.com/zicjoe/magen3",
+      "license": "MIT",
+      "install": "pnpm add @magen3/sdk@beta"
+    },
+    {
+      "id": "tab402",
+      "name": "Tab402",
+      "kind": "api",
+      "publisher": {
+        "name": "Eienel",
+        "url": "https://github.com/Eienel"
+      },
+      "description": "x402 pay-per-call rail on Casper testnet in front of Deepgram text-to-speech and cost-routed Gemini completions; the upstream runs only after on-chain settlement. Agents sign locally, but the dashboard's quick-start key is generated server-side.",
+      "url": "https://tab402.fly.dev",
+      "auth": [
+        "x402"
+      ],
+      "pricing": "paid",
+      "pricingNote": "Prices are in Tab402's own testnet CEP-18 token, which its dashboard hands out free: /v1/speak costs 0.02 plus 0.0006 per character, capped at 1.0; /v1/quote is free.",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Eienel/tab402/main/README.md",
+        "cite": "https://github.com/Eienel/tab402"
+      },
+      "source": "https://github.com/Eienel/tab402",
+      "license": "MIT",
+      "caution": "The dashboard's quick-start key is generated on Tab402's server, so the service knows it; sign with a key you created yourself."
+    },
+    {
+      "id": "cascet",
+      "name": "CasCet",
+      "kind": "sdk",
+      "publisher": {
+        "name": "mericcintosun",
+        "url": "https://github.com/mericcintosun"
+      },
+      "description": "CLI and libraries that put a per-tool x402 paywall in front of any MCP server (wrap) and let MCP hosts pay such servers under a spending budget (connect), with cascading multi-hop payments; settles CEP-18 on Casper via an x402 facilitator (default x402-facilitator.cspr.cloud, or self-hosted).",
+      "url": "https://www.npmjs.com/package/@cascet/cli",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/mericcintosun/CasCet/main/README.md",
+        "cite": "https://github.com/mericcintosun/CasCet"
+      },
+      "source": "https://github.com/mericcintosun/CasCet",
+      "license": "Apache-2.0",
+      "install": "npx @cascet/cli init"
+    },
+    {
+      "id": "casper-x402",
+      "name": "Casper x402 (casper-x402)",
+      "kind": "sdk",
+      "publisher": {
+        "name": "MAKE Software",
+        "url": "https://makegroup.io"
+      },
+      "description": "MAKE's x402 implementation for Casper: the @make-software/casper-x402 npm package (exact-scheme client, server and facilitator) and a Go module with reference facilitator, resource server and client. Payers sign EIP-712 authorizations locally; settlement uses CEP-18 transfer_with_authorization.",
+      "url": "https://www.npmjs.com/package/@make-software/casper-x402",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/make-software/casper-x402/master/README.md",
+        "cite": "https://github.com/make-software/casper-x402"
+      },
+      "source": "https://github.com/make-software/casper-x402",
+      "license": "Apache-2.0",
+      "install": "npm install @make-software/casper-x402"
+    },
+    {
+      "id": "casper-eip-712",
+      "name": "casper-eip-712",
+      "kind": "sdk",
+      "publisher": {
+        "name": "Casper Ecosystem",
+        "url": "https://github.com/casper-ecosystem"
+      },
+      "description": "EIP-712 typed-data hashing and signature verification for Casper: a no_std Rust crate plus TypeScript and Go packages. Its TransferAuthorization and BatchTransferAuthorization structs are the signing layer the @make-software/casper-x402 package depends on.",
+      "url": "https://www.npmjs.com/package/@casper-ecosystem/casper-eip-712",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/casper-ecosystem/casper-eip-712/master/README.md",
+        "cite": "https://github.com/casper-ecosystem/casper-eip-712"
+      },
+      "source": "https://github.com/casper-ecosystem/casper-eip-712",
+      "license": "Apache-2.0",
+      "install": "npm install @casper-ecosystem/casper-eip-712"
+    },
+    {
+      "id": "casper-trust",
+      "name": "casper-trust",
+      "kind": "sdk",
+      "publisher": {
+        "name": "Bekirerdem",
+        "url": "https://github.com/Bekirerdem"
+      },
+      "description": "TypeScript SDK for agent identity, reputation and escrow contracts on Casper testnet: read an agent's on-chain trust score without a wallet, register bonded agents, and gate x402 payments (via @make-software/casper-x402) on a minimum score before any money moves.",
+      "url": "https://www.npmjs.com/package/casper-trust",
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/Bekirerdem/casper-trust-layer/main/README.md",
+        "cite": "https://github.com/Bekirerdem/casper-trust-layer"
+      },
+      "source": "https://github.com/Bekirerdem/casper-trust-layer",
+      "license": "MIT",
+      "install": "npm install casper-trust"
+    },
+    {
+      "id": "casper-x402-payment-rail-webrtc",
+      "name": "casper-webrtc-stream x402 SDK",
+      "kind": "sdk",
+      "publisher": {
+        "name": "nickthelegend",
+        "url": "https://github.com/nickthelegend"
+      },
+      "description": "x402 micropayment SDK for Casper: Express middleware and a framework-agnostic gate that settle CEP-18 transfer_with_authorization payments via the CSPR.cloud facilitator, plus a wrapped fetch that auto-pays 402s with a local key or CSPR.click wallet; includes pay-per-second WebRTC streaming.",
+      "url": "https://www.npmjs.com/package/@nickthelegend69/webrtc-payment-rail-x402",
+      "pricing": "free",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/nickthelegend/casper-webrtc-stream/main/docs/X402.md",
+        "cite": "https://github.com/nickthelegend/casper-webrtc-stream/blob/main/docs/X402.md"
+      },
+      "source": "https://github.com/nickthelegend/casper-webrtc-stream",
+      "license": "MIT",
+      "install": "npm i @nickthelegend69/webrtc-payment-sdk-core @nickthelegend69/webrtc-payment-rail-x402"
+    },
+    {
+      "id": "castai-sdk",
+      "name": "castAI",
+      "kind": "sdk",
+      "publisher": {
+        "name": "fozagtx",
+        "url": "https://github.com/fozagtx"
+      },
+      "description": "TypeScript kit for paid HTTP on Casper: x402 and MPP payments as native CSPR transfer deploys (not the CEP-18/EIP-712 scheme of casper-x402), AI SDK/OpenAI/LangChain/AgentKit/GOAT adapters, checkout UI, CLI, self-hostable MCP server and Claude Code plugin. Signs locally.",
+      "url": "https://www.npmjs.com/package/@castaisdk/x402",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/fozagtx/castAI/main/README.md",
+        "cite": "https://github.com/fozagtx/castAI"
+      },
+      "source": "https://github.com/fozagtx/castAI",
+      "license": "Apache-2.0",
+      "install": "npm install @castaisdk/ai-sdk ai @castaisdk/x402 @castaisdk/mpp casper-js-sdk"
+    },
+    {
+      "id": "cspr-cloud-net",
+      "name": "CSPR.Cloud.Net",
+      "kind": "sdk",
+      "publisher": {
+        "name": "msanlisavas",
+        "url": "https://github.com/msanlisavas"
+      },
+      "description": ".NET Standard 2.0/2.1 client library for the CSPR.cloud REST and Streaming APIs on Casper mainnet and testnet; since v4.2.0 it also wraps the CSPR.cloud x402 facilitator (supported, verify, settle). Ships an llms.txt usage guide for coding agents.",
+      "url": "https://www.nuget.org/packages/CSPR.Cloud.Net",
+      "pricing": "free",
+      "pricingNote": "The library is free (MIT). It calls CSPR.cloud, which needs an access token; plans per https://cspr.build/pricing/: Free $0/mo, Pro $199/mo, Custom.",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/msanlisavas/CSPR.Cloud.Net/master/llms.txt",
+        "cite": "https://github.com/msanlisavas/CSPR.Cloud.Net"
+      },
+      "source": "https://github.com/msanlisavas/CSPR.Cloud.Net",
+      "license": "MIT",
+      "install": "dotnet add package CSPR.Cloud.Net",
+      "ours": true
+    },
+    {
+      "id": "fund402-sdk",
+      "name": "Fund402 SDK",
+      "kind": "sdk",
+      "publisher": {
+        "name": "nickthelegend",
+        "url": "https://github.com/nickthelegend"
+      },
+      "description": "x402 paywall middleware for Express, Hono and Next.js whose payments a Casper lending pool fronts, plus fund402Fetch, a client that borrows just-in-time from the pool (vault borrow_and_pay) to pay a 402 and repays later; servers verify settlement via CSPR.cloud. On testnet.",
+      "url": "https://www.npmjs.com/package/@nickthelegend69/fund402",
+      "pricing": "free-and-paid",
+      "pricingNote": "The SDK is free (MIT). Each Fund402 vault borrow carries a 5% credit fee repaid with the principal, and Tier-1/2 agents escrow 150% collateral. Testnet F402 token only.",
+      "networks": [
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/nickthelegend/fund402-sdk/main/README.md",
+        "cite": "https://github.com/nickthelegend/fund402-sdk"
+      },
+      "source": "https://github.com/nickthelegend/fund402-sdk",
+      "license": "MIT",
+      "install": "npm i @nickthelegend69/fund402"
+    },
+    {
+      "id": "r402-casper",
+      "name": "r402-casper (Rust)",
+      "kind": "sdk",
+      "publisher": {
+        "name": "qntx",
+        "url": "https://github.com/qntx"
+      },
+      "description": "Rust crate adding Casper to the r402 x402 library: buyer-side EIP-712 signing through a caller-supplied signer, server price tags and a client for a remote facilitator (default x402-facilitator.cspr.cloud) for the exact scheme on casper:casper and casper:casper-test.",
+      "url": "https://crates.io/crates/r402-casper",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/qntx/r402/main/crates/r402-casper/README.md",
+        "cite": "https://github.com/qntx/r402/tree/main/crates/r402-casper"
+      },
+      "source": "https://github.com/qntx/r402",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "id": "x402-casper-npm",
+      "name": "x402-casper",
+      "kind": "sdk",
+      "publisher": {
+        "name": "rajkaria",
+        "url": "https://github.com/rajkaria"
+      },
+      "description": "Zero-dependency TypeScript rail for HTTP 402 payments settled by a native CSPR transfer: the server issues payer-bound challenges, verifies the transfer by reading it from a Casper node, and burns its hash against replay. Extracted from the Hunch on Casper app.",
+      "url": "https://www.npmjs.com/package/x402-casper",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/rajkaria/hunch-casper/main/packages/x402-casper/README.md",
+        "cite": "https://github.com/rajkaria/hunch-casper/tree/main/packages/x402-casper"
+      },
+      "source": "https://github.com/rajkaria/hunch-casper",
+      "license": "MIT",
+      "install": "npm i x402-casper"
+    },
+    {
+      "id": "x402-client-casper",
+      "name": "x402.Client.Casper",
+      "kind": "sdk",
+      "publisher": {
+        "name": "Michiel Post",
+        "url": "https://github.com/michielpost"
+      },
+      "description": ".NET package in x402-dotnet that lets an HttpClient pay x402 v2 resources on Casper (wCSPR/CEP-18, EIP-712 authorizations) with Ed25519 or secp256k1 keys signed locally or through a signing delegate. Version 0.0.1, marked beta.",
+      "url": "https://www.nuget.org/packages/x402.Client.Casper",
+      "pricing": "free",
+      "networks": [
+        "casper:casper",
+        "casper:casper-test"
+      ],
+      "docs": {
+        "fetch": "https://raw.githubusercontent.com/michielpost/x402-dotnet/master/README.md",
+        "cite": "https://github.com/michielpost/x402-dotnet#x402-httpclient-on-casper"
+      },
+      "source": "https://github.com/michielpost/x402-dotnet",
+      "license": "MIT"
     }
   ]
 }

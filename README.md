@@ -27,12 +27,59 @@ the colon is where a person reads it.
 Every capability with its endpoint, authentication, pricing and networks is in
 [directory.md](directory.md), generated from [catalog.json](catalog.json). A
 [weekly check](.github/workflows/check.yml) confirms that each one still answers, and opens an
-issue when one does not. To list yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
+issue when one does not. Listing is not an endorsement or a security audit: many entries are
+early projects that run only on testnet, and some carry a caution worth reading first. To list
+yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 
 <!-- catalog:start -->
 | Capability | Kind | Publisher | Access |
 |---|---|---|---|
+| [AstralBeam docs llms.txt](directory.md#astralbeam-docs-llmstxt) | llms.txt | MAKE Software | Free |
+| [Casper JS SDK llms.txt](directory.md#casper-js-sdk-llmstxt) | llms.txt | Casper Ecosystem | Free |
+| [CSPR.click docs llms.txt](directory.md#csprclick-docs-llmstxt) | llms.txt | MAKE Software | Free |
+| [CSPR.cloud docs llms.txt](directory.md#csprcloud-docs-llmstxt) | llms.txt | MAKE Software | Free |
+| [CSPR.market docs llms.txt](directory.md#csprmarket-docs-llmstxt) | llms.txt | MAKE Software | Free |
+| [Odra framework llms.txt](directory.md#odra-framework-llmstxt) | llms.txt | Odra.dev | Free |
+| [AgentGate](directory.md#agentgate) | MCP server | mdlog | no key; free |
+| [AgentPay (Casper x402 charge checker)](directory.md#agentpay-casper-x402-charge-checker) | MCP server | Timidan | no key, API key, x402 per call; free and paid |
+| [Casper MCP Python Server](directory.md#casper-mcp-python-server) | MCP server | Jiu-hong | no key; free |
+| [Casper Network MCP Server (Tairon.ai)](directory.md#casper-network-mcp-server-taironai) | MCP server | Tairon.ai | no key; free |
 | [casper-mcp](directory.md#casper-mcp) | MCP server | msanlisavas | API key; free |
+| [casper-mcp-py](directory.md#casper-mcp-py) | MCP server | Tmalone1250 | no key; free |
+| [casper-rust-wasm-sdk MCP server](directory.md#casper-rust-wasm-sdk-mcp-server) | MCP server | Interchouette - ITC | no key; free |
+| [CasperAI MCP server](directory.md#casperai-mcp-server) | MCP server | msanlisavas | no key, API key, x402 per call; free and paid |
+| [CasperFlow MCP server](directory.md#casperflow-mcp-server) | MCP server | emmgr23 | no key; free |
+| [ceps-rust-ts-client MCP server](directory.md#ceps-rust-ts-client-mcp-server) | MCP server | Interchouette ITC | no key; free |
+| [CSPR.AI MCP server](directory.md#csprai-mcp-server) | MCP server | Blockchain-Oracle | no key; free |
+| [CSPR.cloud MCP server](directory.md#csprcloud-mcp-server) | MCP server | MAKE Software | API key; free and paid |
+| [CSPR.trade MCP server](directory.md#csprtrade-mcp-server) | MCP server | MAKE Software | no key; free |
+| [Mr Mainspring](directory.md#mr-mainspring) | MCP server | Micoh18 | no key; free |
+| [Sluice](directory.md#sluice) | MCP server | Unity Nodes | no key; free and paid |
+| [Casper testnet deploy skill (casper-js-sdk)](directory.md#casper-testnet-deploy-skill-casper-js-sdk) | Agent skill | TerexitariusStomp | Free |
+| [CSPR.click SDK integration skill](directory.md#csprclick-sdk-integration-skill) | Agent skill | MAKE Software | Free |
+| [CSPR.cloud AI skill](directory.md#csprcloud-ai-skill) | Agent skill | MAKE Software | Free |
+| [CSPR.trade DEX assistant skill](directory.md#csprtrade-dex-assistant-skill) | Agent skill | MAKE Software | Free |
+| [Fund402 agent skills](directory.md#fund402-agent-skills) | Agent skill | nickthelegend | Free and paid |
+| [Odra Casper testnet deploy skill](directory.md#odra-casper-testnet-deploy-skill) | Agent skill | t9fiction | Free |
+| [Casper plugin for ElizaOS](directory.md#casper-plugin-for-elizaos) | Plugin | xinminsu | Free |
+| [Casper plugin for Hermes Agent](directory.md#casper-plugin-for-hermes-agent) | Plugin | xinminsu | Free |
+| [Casper plugin for OpenClaw](directory.md#casper-plugin-for-openclaw) | Plugin | xinminsu | Free |
+| [Odra Claude Code plugin (odradev-plugins)](directory.md#odra-claude-code-plugin-odradev-plugins) | Plugin | Odra.dev | Free |
+| [CasperAI API](directory.md#casperai-api) | API | msanlisavas | API key, x402 per call; paid |
+| [CSPR.cloud x402 facilitator](directory.md#csprcloud-x402-facilitator) | API | MAKE Software | API key; free and paid |
+| [Magen3 Agent Gateway](directory.md#magen3-agent-gateway) | API | zicjoe | API key; free |
+| [Tab402](directory.md#tab402) | API | Eienel | x402 per call; paid |
+| [CasCet](directory.md#cascet) | SDK | mericcintosun | Free |
+| [Casper x402 (casper-x402)](directory.md#casper-x402-casper-x402) | SDK | MAKE Software | Free |
+| [casper-eip-712](directory.md#casper-eip-712) | SDK | Casper Ecosystem | Free |
+| [casper-trust](directory.md#casper-trust) | SDK | Bekirerdem | Free |
+| [casper-webrtc-stream x402 SDK](directory.md#casper-webrtc-stream-x402-sdk) | SDK | nickthelegend | Free |
+| [castAI](directory.md#castai) | SDK | fozagtx | Free |
+| [CSPR.Cloud.Net](directory.md#csprcloudnet) | SDK | msanlisavas | Free |
+| [Fund402 SDK](directory.md#fund402-sdk) | SDK | nickthelegend | Free and paid |
+| [r402-casper (Rust)](directory.md#r402-casper-rust) | SDK | qntx | Free |
+| [x402-casper](directory.md#x402-casper) | SDK | rajkaria | Free |
+| [x402.Client.Casper](directory.md#x402clientcasper) | SDK | Michiel Post | Free |
 <!-- catalog:end -->
 
 ## Guides

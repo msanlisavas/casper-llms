@@ -31,6 +31,8 @@ LATEST = {
     "docs.casper.network": lambda: version_of(released_docs_dir("casper-network/docs-redux", "main")),
 }
 
+REPO_PAGE = re.compile(r"^https://github\.com/[^/]+/[^/#?]+/?$")
+
 # Package pages that answer bots badly are checked on their registry's API instead.
 REGISTRY_APIS = [
     (re.compile(r"^https://www\.nuget\.org/packages/([^/?#]+)"),
@@ -105,10 +107,18 @@ def probe_entry(entry: dict, get=http_get, post=http_post_json, fetch=fetch_mark
     if kind == "mcp-server" and entry.get("hosting") == "hosted":
         problem = probe_mcp(entry["url"], post)
     elif kind in ("mcp-server", "plugin"):
-        problem = probe_repo(entry.get("source") or entry["url"], get)
+        # Its repository if it has one; else its package, checked on the registry API because
+        # npmjs.com and crates.io turn scripted requests away.
+        if entry.get("source") or not any(p.match(entry["url"]) for p, _ in REGISTRY_APIS):
+            problem = probe_repo(entry.get("source") or entry["url"], get)
+        else:
+            problem = probe_package(entry["url"], get)
     elif kind in ("llms-txt", "agent-skill") and entry["url"] != entry["docs"]["fetch"]:
-        body, why = fetch(entry["url"])
-        problem = None if body is not None else f"{entry['url']}: {why}"
+        if REPO_PAGE.match(entry["url"]):    # a repository of several skills: its page is HTML by design
+            problem = probe_repo(entry["url"], get)
+        else:
+            body, why = fetch(entry["url"])
+            problem = None if body is not None else f"{entry['url']}: {why}"
     elif kind == "api":
         status, _, _ = get(entry["url"])
         problem = None if 0 < status < 500 else f"{entry['url']}: HTTP {status}"

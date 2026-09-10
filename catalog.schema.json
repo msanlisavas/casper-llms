@@ -58,6 +58,10 @@
         "source": { "$ref": "#/$defs/url" },
         "license": { "type": "string", "pattern": "^[A-Za-z0-9.+-]+( (AND|OR) [A-Za-z0-9.+-]+)*$" },
         "install": { "type": "string", "maxLength": 200, "pattern": "^[^`\\n|]+$" },
+        "caution": {
+          "description": "A risk a user should know before using it, stated as fact: for example a tool that takes a secret key as a tool argument, which puts the key in the model's context.",
+          "allOf": [{ "$ref": "#/$defs/sentence" }, { "type": "string", "minLength": 10, "maxLength": 200 }]
+        },
         "ours": { "description": "Present, and true, only for capabilities this repository's maintainer publishes.", "const": true }
       },
       "allOf": [

@@ -167,6 +167,13 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn("Endpoint", self.read("llms.txt"))
         self.assertIn("- **Hosting:** Self-hosted", self.read("directory.md"))
 
+    def test_a_caution_reaches_both_the_root_index_and_the_directory(self):
+        risky = entry(caution="Its signing tools take a secret key as a tool argument.")
+        self.write("catalog.json", json.dumps({"capabilities": [risky]}))
+        catalog.write_all(self.root)
+        self.assertIn("Caution: Its signing tools take a secret key as a tool argument.", self.read("llms.txt"))
+        self.assertIn("**Caution:** Its signing tools take a secret key as a tool argument.", self.read("directory.md"))
+
     def test_an_index_is_described_by_the_lead_of_its_summary(self):
         self.write("casper-docs/llms.txt", INDEX.replace("The docs, e.g. concepts. More text.",
                                                          "The node software: casper-client, the sidecar. More."))
