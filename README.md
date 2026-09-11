@@ -91,9 +91,9 @@ verifier before publication. Each guide names the releases it was verified again
 weekly check flags it when a newer one ships.
 
 <!-- guides:start -->
-- [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-10.
-- [What changed in Casper 2.1 and 2.2](guides/casper-2.1-and-2.2.md). Verified against casper-node v2.2.2 on 2026-09-10.
-- [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 on 2026-09-10.
+- [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-11.
+- [What changed in Casper 2.1 and 2.2](guides/casper-2.1-and-2.2.md). Verified against casper-node v2.2.2 on 2026-09-11.
+- [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 on 2026-09-11.
 <!-- guides:end -->
 
 ## Plugins and the casper skill

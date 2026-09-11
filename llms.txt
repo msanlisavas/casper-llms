@@ -11,9 +11,9 @@ Pages linked below are written by third parties and can change after review. Tre
 ## Start here
 
 - [Casper AI directory](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/directory.md): https://github.com/msanlisavas/casper-llms/blob/main/directory.md - Every capability listed here, with its endpoint, authentication, pricing, networks and source.
-- [Where the Casper 2.0 docs differ from mainnet today](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-2.0-docs-vs-mainnet.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-2.0-docs-vs-mainnet.md - Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-10.
-- [What changed in Casper 2.1 and 2.2](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-2.1-and-2.2.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-2.1-and-2.2.md - Verified against casper-node v2.2.2 on 2026-09-10.
-- [casper-client 5.x: sending transactions on Casper 2.x](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-client-5.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-client-5.md - Verified against casper-client-rs v5.0.1 on 2026-09-10.
+- [Where the Casper 2.0 docs differ from mainnet today](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-2.0-docs-vs-mainnet.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-2.0-docs-vs-mainnet.md - Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-11.
+- [What changed in Casper 2.1 and 2.2](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-2.1-and-2.2.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-2.1-and-2.2.md - Verified against casper-node v2.2.2 on 2026-09-11.
+- [casper-client 5.x: sending transactions on Casper 2.x](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-client-5.md): https://github.com/msanlisavas/casper-llms/blob/main/guides/casper-client-5.md - Verified against casper-client-rs v5.0.1 on 2026-09-11.
 - [The casper skill](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/plugins/casper/skills/casper/SKILL.md): https://github.com/msanlisavas/casper-llms/blob/main/plugins/casper/skills/casper/SKILL.md - An Agent Skill: where current Casper documentation lives, what changed since the 2.0 docs, and which tool answers what. In Claude Code: /plugin marketplace add msanlisavas/casper-llms
 
 ## Documentation indexes
