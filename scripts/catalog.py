@@ -45,7 +45,7 @@ PRICING = {"free": "Free", "paid": "Paid", "free-and-paid": "Free and paid"}
 
 # Release lines a guide can be verified against. check.py looks up the latest of each; a guide
 # naming anything else could never be flagged as stale, so validate.py refuses it.
-COMPONENTS = ("casper-node", "casper-client-rs", "docs.casper.network")
+COMPONENTS = ("casper-node", "casper-client-rs", "docs.casper.network", "cspr-name-contracts")
 
 # Our indexes in reading order; any other folder with an llms.txt follows alphabetically.
 INDEX_ORDER = ("casper-docs", "casper-guides", "casper-node-tools", "casper-sdks", "casper-standards",

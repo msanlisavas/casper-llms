@@ -23,7 +23,8 @@ import urllib.request
 from pathlib import Path
 
 import catalog
-from generate import UA, fetch_markdown, latest_release, media_type, released_docs_dir, version_of
+from generate import (UA, default_branch_date, fetch_markdown, latest_release, media_type,
+                      released_docs_dir, version_of)
 
 FINDINGS = 3
 PROBE_SECONDS = 45      # whole-request budget for one probe
@@ -39,6 +40,8 @@ LATEST = {
     "casper-node": lambda: latest_release("casper-network/casper-node"),
     "casper-client-rs": lambda: latest_release("casper-ecosystem/casper-client-rs"),
     "docs.casper.network": lambda: version_of(released_docs_dir("casper-network/docs-redux", "main")),
+    # No releases and no tags: the commit date of its default branch is the version.
+    "cspr-name-contracts": lambda: default_branch_date("make-software/cspr-name-contracts"),
 }
 
 REPO_PAGE = re.compile(r"^https://github\.com/[^/]+/[^/#?]+/?$")

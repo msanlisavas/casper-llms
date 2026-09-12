@@ -178,6 +178,24 @@ def latest_release(repo: str) -> str:
     return json.loads(body)["tag_name"]
 
 
+def default_branch_date(repo: str) -> str:
+    """The date of the newest commit on a repository's default branch, as YYYY.MM.DD.
+
+    The staleness signal for a repository that ships no releases and no tags, so latest_release
+    has nothing to read: make-software/cspr-name-contracts is the only account of how CSPR.name
+    works, and a guide pinned to one of its commits has to be re-read when that source moves.
+    A date is the only version-shaped thing such a repository has - its crate version has stood
+    at 0.1.0 since 2024 and would never flag anything."""
+    status, _, body = http_get(f"https://api.github.com/repos/{repo}", api=True)
+    if status != 200:
+        sys.exit(f"repository {repo} failed with HTTP {status}")
+    branch = json.loads(body)["default_branch"]
+    status, _, body = http_get(f"https://api.github.com/repos/{repo}/commits/{branch}", api=True)
+    if status != 200:
+        sys.exit(f"latest commit of {repo}@{branch} failed with HTTP {status}")
+    return json.loads(body)["commit"]["committer"]["date"][:10].replace("-", ".")
+
+
 def version_key(tag: str) -> tuple[int, ...]:
     return tuple(int(n) for n in re.findall(r"\d+", tag)[:3])
 
