@@ -99,6 +99,7 @@ moves.
 - [Casper execution errors: decoding ApiError codes, system-contract errors and rejected transactions](guides/casper-error-codes.md). Verified against casper-node v2.2.2, casper-client-rs v5.0.1, casper-sidecar v2.1.0 and docs.casper.network 2.0.0 on 2026-09-23.
 - [Casper governance: validator votes CVV001 to CVV010, the Casper Association and its published accounts](guides/casper-governance.md). Verified against casper-node v2.2.2 on 2026-09-23.
 - [Liquid staking and DeFi on Casper: sCSPR, WCSPR, CSPR.trade, Styks, Friendly Market and csprUSD](guides/casper-liquid-staking-and-defi.md). Verified against casper-node v2.2.2, docs.casper.network 2.0.0, liquid-staking-contracts 2026.07.20, casper-trade 2026.08.13, styks 2026.07.13, wcspr 2026.07.13, cspr-trade-mcp v0.6.0, docs.friendly.market 2025.09.12 and docs.astralbeam.io 2026.09.21 on 2026-09-23.
+- [Casper roadmap and EVM status: the Casper Manifest item by item against mainnet](guides/casper-roadmap-and-evm.md). Verified against casper-node v2.2.2 and casper-client-rs v5.0.1 on 2026-09-23.
 - [Casper Wallet: setup, recovery, dApps, Ledger, swap and scam safety](guides/casper-wallet.md). Verified against casper-wallet v2.8.0, casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-23.
 - [CSPR.name: registering, renewing and resolving .cspr names](guides/cspr-name.md). Verified against cspr-name-contracts 2026.06.23 on 2026-09-12.
 <!-- guides:end -->
@@ -137,7 +138,7 @@ fetch, grouped into sections.
 | Index | Pages | Covers |
 |---|---|---|
 | [`casper-docs/llms.txt`](casper-docs/llms.txt) | 221 | The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux |
-| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 9 | Guides written for this repository on what the official Casper documentation does not cover yet |
+| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 10 | Guides written for this repository on what the official Casper documentation does not cover yet |
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | Operator and integrator references for the Casper node software |
 | [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 183 | Developer documentation for the Casper SDKs |
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
