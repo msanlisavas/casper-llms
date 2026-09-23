@@ -118,6 +118,7 @@ The docs' tutorials still show 1.x-era `put-deploy` commands
 | Decoding a failed or rejected transaction: `User error: N`, `Mint error: N`, auction errors, ApiError exit codes, JSON-RPC rejection codes | [Casper execution errors](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-error-codes.md), which links each code to the source line that defines it |
 | Casper Wallet: installing it from the right place, the recovery phrase and password, connecting to dApps, signing requests, Ledger, swap and wrap, scams | [Casper Wallet guide](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-wallet.md), pinned to the extension's v2.8.0 source; for connecting a dApp to a wallet, the CSPR.click docs above |
 | Liquid staking (sCSPR), WCSPR, CSPR.trade's contracts and fees, the Styks price oracle, Friendly Market, csprUSD | [Liquid staking and DeFi on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-liquid-staking-and-defi.md), checked against the contracts' source and mainnet state, with a list of what their READMEs get wrong |
+| Validator votes CVV001 to CVV010, how on-chain voting works, the Casper Association's delegation policy, board and published accounts | [Casper governance](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-governance.md): each vote's proposal, published outcome, on-chain tally and effect, dated |
 
 ## Live chain data
 
