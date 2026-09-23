@@ -86,8 +86,8 @@ yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 
 The official documentation describes Casper 2.0; mainnet has moved on. These guides cover
 what the documentation does not. Every factual sentence links its source: a release tag or a
-commit where one exists, otherwise a dated, content-addressed file from the publisher's own
-site. Each claim was re-derived from its source by an independent verifier before publication.
+commit where one exists, otherwise the page, file or live response it came from, with the date
+it was read. Each claim was re-derived from its source by an independent verifier before publication.
 Each guide names what it was verified against, and the weekly check flags it when that source
 moves.
 

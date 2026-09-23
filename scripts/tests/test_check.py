@@ -188,7 +188,8 @@ class SiteShellTests(unittest.TestCase):
         self.assertEqual(self.version(SHELL), "shell-" + hashlib.sha256(SHELL.encode("utf-8")).hexdigest()[:12])
 
     def test_a_redeploy_of_the_same_bytes_is_the_same_version(self):
-        self.assertEqual(self.version(SHELL), self.version("".join(SHELL)))
+        # A redeploy changes what is around the body - here the Content-Type parameters - not the body.
+        self.assertEqual(self.version(SHELL), self.version(SHELL, content_type="text/html; charset=utf-8"))
 
     def test_a_new_bundle_moves_the_version(self):
         self.assertNotEqual(self.version(SHELL), self.version(SHELL.replace("DSzftkm_", "Ab3dE9_x")))

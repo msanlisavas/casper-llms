@@ -107,10 +107,12 @@ not cover. An LLM repeats what it is given, so the rules are strict:
 - Every factual sentence links a **pinned** source: a release tag or a full commit SHA, never a
   branch. A claim no source supports is cut, not softened.
 - A source with no releases - a website, a documentation site, a live API - cannot be pinned
-  that way. Cite the content-hashed file you read (a website's `assets/index-<hash>.js`, say) with
-  its size and SHA-256 in the guide's sources, and put the date it was read in every sentence
-  that quotes a website or a live response: a retrieved passage reaches a reader without the
-  rest of the page.
+  that way. Cite a website by the content-hashed file you read (its `assets/index-<hash>.js`,
+  say), and list that file with its size and SHA-256 in the guide's sources. Cite a
+  documentation page, a file served under a fixed name or a live response by its URL, and list
+  it in the sources with the date it was read. Put that date in every paragraph, list item and
+  table that quotes a website, a file one serves or a live response, in the sentence that quotes
+  it wherever it fits: a retrieved passage reaches a reader without the rest of the page.
 - Line 1 is the title (`# ...`), line 2 is blank, and line 3 names what the guide was verified
   against: `Verified against casper-node v2.2.2 on 2026-09-10.` The components the weekly check
   can follow are `casper-node`, `casper-client-rs`, `docs.casper.network`, `cspr-name-contracts`,
