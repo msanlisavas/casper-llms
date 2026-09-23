@@ -106,15 +106,28 @@ not cover. An LLM repeats what it is given, so the rules are strict:
 
 - Every factual sentence links a **pinned** source: a release tag or a full commit SHA, never a
   branch. A claim no source supports is cut, not softened.
+- A source with no releases - a website, a documentation site, a live API - cannot be pinned
+  that way. Cite the content-hashed file you read (a website's `assets/index-<hash>.js`, say) with
+  its size and SHA-256 in the guide's sources, and put the date it was read in every sentence
+  that quotes a website or a live response: a retrieved passage reaches a reader without the
+  rest of the page.
 - Line 1 is the title (`# ...`), line 2 is blank, and line 3 names what the guide was verified
   against: `Verified against casper-node v2.2.2 on 2026-09-10.` The components the weekly check
-  can follow are `casper-node`, `casper-client-rs` and `docs.casper.network`.
-- No YAML frontmatter and no HTML.
+  can follow are `casper-node`, `casper-client-rs`, `docs.casper.network`, `cspr-name-contracts`,
+  `astralbeam.io`, `testnet.astralbeam.io` and `docs.astralbeam.io`. A release line's version is
+  its tag. A repository with no releases is versioned by the date of its newest commit, and a
+  documentation site by the date of its newest page edit, both written `YYYY.MM.DD`. A
+  single-page website is versioned by the digest of the HTML shell it serves, written
+  `shell-<12 hex digits>`; `cd scripts && python -c "import check; print(check.LATEST['astralbeam.io']())"`
+  prints the current one.
+- No YAML frontmatter and no HTML, not even inside code: a guide about a website cannot quote the
+  site's own markup.
 - Command examples use placeholders such as `<PATH-TO-YOUR-SECRET-KEY>` and never real keys.
 
-When the weekly check reports that a newer release has shipped, re-verify the guide against it,
-correct what changed, and update the verification line. Run
-`python scripts/generate.py --catalog-only` after any change to `guides/`.
+When the weekly check reports that a source has moved - a newer release, a newer commit or page
+edit, or a different website shell - re-verify the guide against it, correct what changed, and
+update the verification line. Run `python scripts/generate.py --catalog-only` after any change
+to `guides/`.
 
 ## Reporting a broken or stale link
 

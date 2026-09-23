@@ -85,10 +85,11 @@ yours, see [CONTRIBUTING.md](CONTRIBUTING.md#listing-an-ai-capability).
 ## Guides
 
 The official documentation describes Casper 2.0; mainnet has moved on. These guides cover
-what the documentation does not. Every factual sentence links a pinned source, such as a
-release tag or a commit, and each claim was re-derived from its source by an independent
-verifier before publication. Each guide names the releases it was verified against, and the
-weekly check flags it when a newer one ships.
+what the documentation does not. Every factual sentence links its source: a release tag or a
+commit where one exists, otherwise a dated, content-addressed file from the publisher's own
+site. Each claim was re-derived from its source by an independent verifier before publication.
+Each guide names what it was verified against, and the weekly check flags it when that source
+moves.
 
 <!-- guides:start -->
 - [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-11.

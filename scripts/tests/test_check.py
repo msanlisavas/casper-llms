@@ -172,5 +172,71 @@ class StaleGuideTests(unittest.TestCase):
         self.assertEqual(set(check.LATEST), set(catalog.COMPONENTS))
 
 
+SHELL = ('<!doctype html><html><head><meta name="description" content="Public testnet live, mainnet October 2026." />'
+         '<script type="module" crossorigin src="/assets/index-DSzftkm_.js"></script></head>'
+         '<body><div id="root"></div></body></html>')
+
+
+class SiteShellTests(unittest.TestCase):
+    """A website with no releases is versioned by the digest of the shell it serves."""
+
+    def version(self, body, status=200, content_type="text/html"):
+        return check.site_shell("https://site.example/", lambda url, api=False: (status, content_type, body))
+
+    def test_the_version_is_the_digest_of_the_shell(self):
+        import hashlib
+        self.assertEqual(self.version(SHELL), "shell-" + hashlib.sha256(SHELL.encode("utf-8")).hexdigest()[:12])
+
+    def test_a_redeploy_of_the_same_bytes_is_the_same_version(self):
+        self.assertEqual(self.version(SHELL), self.version("".join(SHELL)))
+
+    def test_a_new_bundle_moves_the_version(self):
+        self.assertNotEqual(self.version(SHELL), self.version(SHELL.replace("DSzftkm_", "Ab3dE9_x")))
+
+    def test_an_edit_to_the_meta_tags_alone_moves_the_version(self):
+        self.assertNotEqual(self.version(SHELL), self.version(SHELL.replace("October", "November")))
+
+    def test_a_shell_that_loads_a_runtime_config_first_is_still_a_shell(self):
+        # testnet.astralbeam.io loads /config.<hash>.js before its entry bundle.
+        body = SHELL.replace('<script type="module"', '<script src="/config.6b682550.js"></script><script type="module"')
+        self.assertTrue(self.version(body).startswith("shell-"))
+
+    def test_a_page_that_is_not_a_vite_shell_is_reported_not_compared(self):
+        for args in ((SHELL, 404), (SHELL, 200, "text/plain"), ("<html><body>moved</body></html>",),
+                     (SHELL.replace("index-DSzftkm_", "main"),)):
+            with self.assertRaises(RuntimeError):
+                self.version(*args)
+
+    def test_a_site_lookup_that_fails_is_reported_not_fatal(self):
+        def fails():
+            raise RuntimeError("https://astralbeam.io/ answered HTTP 503 (text/html)")
+        latest, problems = check.latest_versions({"astralbeam.io"}, {"astralbeam.io": fails})
+        self.assertEqual(latest, {})
+        self.assertIn("could not determine the latest astralbeam.io", problems[0])
+
+    def test_a_guide_verified_against_an_older_shell_is_stale(self):
+        guide = catalog.Guide("guides/astralbeam.md", "A", "Verified against astralbeam.io shell-0d177dc86bed on 2026-09-23.",
+                              {"astralbeam.io": "shell-0d177dc86bed"})
+        self.assertEqual(check.stale_guides([guide], {"astralbeam.io": "shell-0d177dc86bed"}), [])
+        self.assertEqual(check.stale_guides([guide], {"astralbeam.io": "shell-9a1b2c3d4e5f"}),
+                         ["guides/astralbeam.md: verified against astralbeam.io shell-0d177dc86bed; "
+                          "the latest is shell-9a1b2c3d4e5f"])
+
+
+class SitemapDateTests(unittest.TestCase):
+    """A documentation site with no releases is versioned by the newest page edit in its sitemap."""
+
+    def test_the_version_is_the_newest_lastmod(self):
+        xml = ("<urlset><url><lastmod>2026-09-09T10:00:00Z</lastmod></url>"
+               "<url><lastmod>2026-09-21T20:48:17.811Z</lastmod></url><url><lastmod>2026-08-11</lastmod></url></urlset>")
+        self.assertEqual(check.sitemap_date("https://d/", lambda url, api=False: (200, "application/xml", xml)), "2026.09.21")
+
+    def test_an_html_answer_or_an_empty_sitemap_is_reported(self):
+        for status, content_type, body in ((200, "text/html", "<lastmod>2026-09-21</lastmod>"),
+                                           (200, "application/xml", "<urlset/>"), (404, "application/xml", "")):
+            with self.assertRaises(RuntimeError):
+                check.sitemap_date("https://d/", lambda url, api=False: (status, content_type, body))
+
+
 if __name__ == "__main__":
     unittest.main()

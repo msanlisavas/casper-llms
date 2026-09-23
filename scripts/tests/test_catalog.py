@@ -145,6 +145,39 @@ class GuideTests(unittest.TestCase):
         _, errors = catalog.parse_guide("guides/a.md", text)
         self.assertTrue(any("casper-sidecar" in e for e in errors))
 
+    def test_a_website_is_followed_by_the_digest_of_its_shell(self):
+        text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0", "astralbeam.io shell-0d177dc86bed")
+        guide, errors = catalog.parse_guide("guides/a.md", text)
+        self.assertEqual(errors, [])
+        self.assertEqual(guide.versions, {"astralbeam.io": "shell-0d177dc86bed"})
+
+    def test_two_websites_and_a_documentation_site_can_share_the_line(self):
+        text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0",
+                                  "astralbeam.io shell-0d177dc86bed, testnet.astralbeam.io shell-624443a40eb2 "
+                                  "and docs.astralbeam.io 2026.09.21")
+        guide, errors = catalog.parse_guide("guides/a.md", text)
+        self.assertEqual(errors, [])
+        self.assertEqual(guide.versions, {"astralbeam.io": "shell-0d177dc86bed",
+                                          "testnet.astralbeam.io": "shell-624443a40eb2",
+                                          "docs.astralbeam.io": "2026.09.21"})
+
+    def test_a_website_and_a_repository_can_share_the_line(self):
+        text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0",
+                                  "astralbeam.io shell-0d177dc86bed and cspr-name-contracts 2026.06.23")
+        guide, _ = catalog.parse_guide("guides/a.md", text)
+        self.assertEqual(guide.versions, {"astralbeam.io": "shell-0d177dc86bed", "cspr-name-contracts": "2026.06.23"})
+
+    def test_a_shell_digest_is_exactly_twelve_lowercase_hex_digits(self):
+        for bad in ("shell-0d177dc86be", "shell-0d177dc86bed0", "shell-0D177DC86BED", "index-DSzftkm_"):
+            text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0", f"astralbeam.io {bad}")
+            _, errors = catalog.parse_guide("guides/a.md", text)
+            self.assertTrue(any("names no component" in e for e in errors), bad)
+
+    def test_a_script_tag_quoted_in_a_code_span_is_still_html(self):
+        # A guide about a website cannot quote the site's own markup, even as code.
+        _, errors = catalog.parse_guide("guides/a.md", GOOD_GUIDE + "The shell loads `<script type=module>`.\n")
+        self.assertTrue(any("HTML" in e for e in errors))
+
     def test_html_is_refused(self):
         _, errors = catalog.parse_guide("guides/a.md", GOOD_GUIDE + "<div>x</div>\n")
         self.assertTrue(any("HTML" in e for e in errors))

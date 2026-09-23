@@ -12,6 +12,7 @@ Usage:  GITHUB_TOKEN=$(gh auth token) python scripts/check.py [--report report.m
 from __future__ import annotations
 
 import concurrent.futures
+import hashlib
 import http.client
 import json
 import os
@@ -42,6 +43,11 @@ LATEST = {
     "docs.casper.network": lambda: version_of(released_docs_dir("casper-network/docs-redux", "main")),
     # No releases and no tags: the commit date of its default branch is the version.
     "cspr-name-contracts": lambda: default_branch_date("make-software/cspr-name-contracts"),
+    # Single-page sites with no releases: the digest of the HTML shell every path answers.
+    "astralbeam.io": lambda: site_shell("https://astralbeam.io/"),
+    "testnet.astralbeam.io": lambda: site_shell("https://testnet.astralbeam.io/"),
+    # A GitBook site with no releases: the newest page edit in its sitemap.
+    "docs.astralbeam.io": lambda: sitemap_date("https://docs.astralbeam.io/sitemap-pages.xml"),
 }
 
 REPO_PAGE = re.compile(r"^https://github\.com/[^/]+/[^/#?]+/?$")
@@ -227,6 +233,39 @@ def safe_probe(entry: dict, probe=probe_entry) -> list[str]:
         return probe(entry)
     except Exception as error:
         return [f"probe failed: {type(error).__name__}"]
+
+
+# A Vite build's entry bundle, named after a hash of its own content, loaded by the shell.
+SHELL_ENTRY = re.compile(r'<script\b[^>]*\btype="module"[^>]*\bsrc="/assets/index-[A-Za-z0-9_-]{8}\.js"')
+
+
+def site_shell(url: str, get=bounded_get) -> str:
+    """The version of a website that ships no releases: "shell-" and the first 12 hex digits of the
+    SHA-256 of the HTML it serves. On a Vite single-page site every path answers that same shell,
+    and the shell names the entry bundle after the bundle's content, which in turn names every lazy
+    chunk after its content, so a change to the copy in the JavaScript moves the digest - and so
+    does an edit to the shell's own meta tags, which carry claims of their own. A redeploy of
+    identical bytes does not. Raises when the page is not such a shell, so a site rebuilt some other
+    way is reported instead of compared against a guess."""
+    status, content_type, body = get(url)
+    if status != 200 or media_type(content_type) != "text/html":
+        raise RuntimeError(f"{url} answered HTTP {status} ({media_type(content_type)})")
+    if not SHELL_ENTRY.search(body):
+        raise RuntimeError(f"{url} no longer loads a content-hashed entry bundle")
+    return "shell-" + hashlib.sha256(body.encode("utf-8")).hexdigest()[:12]
+
+
+LASTMOD = re.compile(r"<lastmod>(\d{4})-(\d{2})-(\d{2})")
+
+
+def sitemap_date(url: str, get=bounded_get) -> str:
+    """The version of a documentation site that ships no releases: the newest <lastmod> in its
+    sitemap, as YYYY.MM.DD, the same shape as default_branch_date. Any page edit moves it."""
+    status, content_type, body = get(url)
+    dates = LASTMOD.findall(body) if status == 200 and "xml" in media_type(content_type) else []
+    if not dates:
+        raise RuntimeError(f"{url} answered HTTP {status} ({media_type(content_type)}) with no lastmod")
+    return ".".join(max(dates))
 
 
 def latest_versions(names: set[str], lookups=LATEST) -> tuple[dict[str, str], list[str]]:
