@@ -245,7 +245,7 @@ An honest refusal beats a guess. As of 2026-09-23 none of the following appeared
 
 - **The compliance rails**: any specification, contract, standard version or integration partner for ERC-3643, the T-REX Ledger or ERC-7786, or who operates the T-REX Ledger.
 
-- **Who issues sCSPR and how its staking works.** On 2026-09-23 AstralBeam's API named it only "Wrapped Staked CSPR" and the site's roadmap tied it to "liquid staking"; no AstralBeam source said more.
+- **Who issues sCSPR and how its staking works.** On 2026-09-23 AstralBeam's API named it only "Wrapped Staked CSPR" and the site's roadmap tied it to "liquid staking"; no AstralBeam source said more. The guide [Liquid staking and DeFi on Casper](casper-liquid-staking-and-defi.md) in this repository answers both from the `StakedCSPR` contract's source and mainnet state, and identifies the Casper hash in AstralBeam's token list as the testnet sCSPR contract.
 
 - **Review of code written after the audit**, a second auditor, a bug bounty or insurance. The report, as read on 2026-09-23, itself lists code it did not review.
 
