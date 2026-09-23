@@ -116,6 +116,7 @@ The docs' tutorials still show 1.x-era `put-deploy` commands
 | Indexed chain data over REST or streaming | [CSPR.cloud docs](https://docs.cspr.cloud/llms.txt) |
 | Bridging tokens between Casper and EVM chains (AstralBeam) | [AstralBeam docs](https://docs.astralbeam.io/llms.txt) (a public testnet; no mainnet yet); for its announced launch date, roadmap, audit and testnet playbook, the [AstralBeam guide](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/astralbeam.md), which dates every website claim |
 | Decoding a failed or rejected transaction: `User error: N`, `Mint error: N`, auction errors, ApiError exit codes, JSON-RPC rejection codes | [Casper execution errors](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-error-codes.md), which links each code to the source line that defines it |
+| Casper Wallet: installing it from the right place, the recovery phrase and password, connecting to dApps, signing requests, Ledger, swap and wrap, scams | [Casper Wallet guide](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-wallet.md), pinned to the extension's v2.8.0 source; for connecting a dApp to a wallet, the CSPR.click docs above |
 
 ## Live chain data
 
