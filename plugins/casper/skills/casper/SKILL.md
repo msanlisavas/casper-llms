@@ -114,6 +114,7 @@ The docs' tutorials still show 1.x-era `put-deploy` commands
 | x402 pay-per-call payments | [x402 on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-x402/llms.txt) |
 | dApp frontends, wallet connection, signing in the browser | [CSPR.click docs](https://docs.cspr.click/llms.txt) |
 | Indexed chain data over REST or streaming | [CSPR.cloud docs](https://docs.cspr.cloud/llms.txt) |
+| Bridging tokens between Casper and EVM chains (AstralBeam) | [AstralBeam docs](https://docs.astralbeam.io/llms.txt) (a public testnet; no mainnet yet); for its announced launch date, roadmap, audit and testnet playbook, the [AstralBeam guide](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/astralbeam.md), which dates every website claim |
 
 ## Live chain data
 
