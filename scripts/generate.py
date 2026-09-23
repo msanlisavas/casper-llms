@@ -337,6 +337,9 @@ class Page:
     fetch: str
     cite: str
     title: str | None = None   # for pages whose own H1 is generic ("Reference", "MCP server")
+    # Orders the page within its section, which otherwise sorts by fetch URL: forum topic ids do not
+    # sort in the order the votes were held (raw/1220 before raw/778).
+    sort: str | None = None
 
 
 @dataclass
@@ -385,6 +388,64 @@ def by_first_dir(strip: str, names: dict[str, str], root: str = "Overview") -> C
 
 # ----------------------------------------------------------------------------- the indexes
 
+# The Casper pages of Friendly Market's GitBook. Its llms.txt is not listed as a source because it also
+# links products-1/* (a lending product on the Nibiru chain) and the Nibiru wallet set-up page, which
+# would answer Casper questions with another chain's instructions. "master" is its introduction.
+FRIENDLY_MARKET_CASPER_PAGES = (
+    "master", "master/wallet-set-up-casper-network", "testnet/get-testnet-cspr",
+    "products/amm", *(f"products/amm/{p}" for p in (
+        "how-to-trade", "how-to-provide-liquidity", "how-to-import-liquidity", "how-to-remove-liquidity",
+        "liquidity-pools", "faq")),
+    "products/nft-marketplace", *(f"products/nft-marketplace/{p}" for p in (
+        "cspr-and-wcspr", "quick-information-and-tips", "nft-profile", "selling-your-nft", "how-to-bid",
+        "fixed-price-purchase", "making-an-offer", "create-your-collection", "managing-your-collection", "faqs",
+        "report-inappropriate-content")),
+    "products/ghobot-or-your-casper-trading-companion",
+    *(f"products/ghobot-or-your-casper-trading-companion/{p}" for p in (
+        "ghobot-setup", "transferring-cspr-to-and-from-ghobot", "transferring-other-tokens", "swapping",
+        "export-wallet", "private-key-security", "faqs")),
+    "products/cspr.fun", *(f"products/cspr.fun/{p}" for p in (
+        "how-to-trade", "how-to-create-a-token", "what-is-a-bonding-curve")),
+    "tokenomics/rei-token", "tokenomics/rei-token-distribution",
+)
+# Pages whose own H1 does not say which product they belong to: the introduction opens "# Introduction",
+# and the FAQ and trading pages of different products share their titles.
+FRIENDLY_MARKET_TITLES = {
+    "master": "Friendly Market: Introduction",
+    "products/amm/faq": "Friendly Swap: FAQ",
+    "products/ghobot-or-your-casper-trading-companion/faqs": "Ghobot: FAQ's",
+    "products/nft-marketplace/faqs": "NFT Marketplace: FAQ's",
+    "products/cspr.fun/how-to-trade": "CSPR.fun: How to Trade",
+}
+
+# The final proposal topic of each validator vote: forum topic id, the slug of its published URL, and its
+# title. Listed by hand: the forum's llms.txt allows targeted fetches of specific topics, not crawling, so
+# this index never discovers topics itself. /raw/<id> returns a topic's posts as markdown without the
+# topic's title, so the title is given here.
+GOVERNANCE_VOTES = (
+    (778, "cvv001-incentivized-testnet-proposal-casper-network-testnet-rewards-program-nov-11-dec-31-2024",
+     "CVV001: Incentivized Testnet Proposal: Casper Network Testnet Rewards Program (Nov 11 - Dec 31, 2024)"),
+    (1220, "cvv002-casper-association-delegation-policy",
+     "CVV002: Casper Association Delegation Policy"),
+    (1279, "cvv003-incentivized-testnet-proposal-casper-network-testnet-rewards-program-feb-03-june-30-2025",
+     "CVV003: Incentivized Testnet Proposal: Casper Network Testnet Rewards Program (Feb 03 - June 30, 2025)"),
+    (1514, "cvv004-incentivized-testnet-proposal-casper-network-testnet-rewards-program-aug-01-dec-31-2025",
+     "CVV004: Incentivized Testnet Proposal: Casper Network Testnet Rewards Program (Aug 01 - Dec 31, 2025)"),
+    (1538, "cvv005-proposal-enable-burning-mechanism",
+     "CVV005: Proposal: Enable Burning Mechanism"),
+    (1539, "cvv006-proposal-implement-minimum-validator-fee-mechanism",
+     "CVV006: Proposal: Implement Minimum Validator Fee Mechanism"),
+    (1560, "cvv007-incentivized-testnet-proposal-casper-network-testnet-rewards-program-feb-01-june-30-2026",
+     "CVV007: Incentivized Testnet Proposal: Casper Network Testnet Rewards Program (Feb 01 - June 30, 2026)"),
+    (1567, "cvv008-proposal-securing-validator-economics-and-network-sustainability",
+     "CVV008: Proposal: Securing Validator Economics and Network Sustainability"),
+    (1570, "cvv009-update-to-the-association-delegation-policy",
+     "CVV009: Update to the Association Delegation Policy"),
+    (1575, "cvv010-incentivized-testnet-proposal-casper-network-testnet-rewards-program-july-01-dec-31-2026",
+     "CVV010: Incentivized Testnet Proposal: Casper Network Testnet Rewards Program (July 01 - Dec 31, 2026)"),
+)
+
+
 def build_indexes() -> list[Index]:
     casper_sitemap = load_sitemap("https://docs.casper.network/sitemap.xml")
     odra_sitemap = load_sitemap("https://odra.dev/sitemap.xml")
@@ -400,6 +461,7 @@ def build_indexes() -> list[Index]:
     node_release = latest_release("casper-network/casper-node")
     launcher_release = latest_release("casper-network/casper-node-launcher")
     java_release = latest_release("casper-network/casper-java-sdk")
+    trade_mcp_release = latest_release("make-software/cspr-trade-mcp")
     net_sdk = "make-software/casper-net-sdk"
     net_release = latest_release(net_sdk)
     # casper-net-sdk's master documents KeyPair.Create and the Casper.Network.SDK.CES namespace,
@@ -600,6 +662,58 @@ def build_indexes() -> list[Index]:
                            "Casper x402 facilitator", exclude=r"(CLAUDE|CHANGELOG)\.md$"),
             ]),
         Index(
+            file="casper-defi/llms.txt",
+            title="Casper DeFi protocols",
+            summary=(
+                "Documentation for the DeFi contracts and apps on Casper mainnet: the StakedCSPR (sCSPR) liquid "
+                "staking contract behind Wise Lending's app, the CSPR.trade exchange contracts, WCSPR (wrapped CSPR "
+                "with CEP-3009 authorized transfers), the Styks CSPRUSD price oracle and the CSPR.trade MCP server "
+                f"and SDK ({trade_mcp_release}), from their source repositories, plus the Casper pages of Friendly "
+                "Market's documentation. Some of these pages disagree with what runs on mainnet: on 2026-09-23 the "
+                "liquid staking README's unstaking time of 'approximately 8 days' was a 16-hour claim delay in the "
+                "deployed contract, and cspr-trade-mcp's '24 public tools' were 23 on its public server. Friendly "
+                "Market's Ghobot is a custodial Telegram trading bot by its own description. "
+                f"{raw_url(SELF_REPO, SELF_REF, 'guides/casper-liquid-staking-and-defi.md')} checks these sources "
+                "against the contracts' state on mainnet and lists every disagreement it found."),
+            collections=[
+                # CHANGELOGs are template stubs, casper-trade's "Audit Report.md" is a list of fix notes, and
+                # styks' blocky-guest README describes a price supplier that was never deployed.
+                Collection("casper-ecosystem/liquid-staking-contracts", "develop",
+                           r"^(README\.md|liquid-staking-contracts/README\.md|js-cli/README\.md)$",
+                           "sCSPR liquid staking (StakedCSPR)"),
+                Collection("odradev/casper-trade", "master", r"^(README\.md|USAGE\.md|cli/README\.md)$",
+                           "CSPR.trade contracts"),
+                Collection("odradev/wcspr", "main", r"^README\.md$", "WCSPR (wrapped CSPR)"),
+                Collection("odradev/styks", "main", r"^README\.md$", "Styks price oracle"),
+                # The release TAG: master runs ahead of it. Plans, specs, announcements and launch copy are
+                # left out, and the skill and llms.txt are already in casper-agent-tools through mcp.cspr.trade.
+                Collection("make-software/cspr-trade-mcp", trade_mcp_release,
+                           r"^(docs/(getting-started|self-hosting|casper-2x-compatibility)\.md"
+                           r"|packages/(sdk|mcp)/README\.md)$",
+                           f"CSPR.trade MCP server and SDK ({trade_mcp_release})"),
+            ],
+            pages=[Page("Friendly Market (Casper pages)",
+                        f"https://docs.friendly.market/{path}.md?displayAgentInstructions=false",
+                        # the introduction is served at the site root; /master answers 307 to it
+                        "https://docs.friendly.market/" if path == "master" else f"https://docs.friendly.market/{path}",
+                        FRIENDLY_MARKET_TITLES.get(path))
+                   for path in FRIENDLY_MARKET_CASPER_PAGES]),
+        Index(
+            file="casper-governance/llms.txt",
+            title="Casper governance proposals",
+            summary=(
+                "The proposal texts of the Casper Network's on-chain validator votes: CVV001 to CVV010, from the "
+                "Casper forum (forum.casper.network), each fetched as markdown through the forum's raw endpoint for "
+                "that one topic. A topic's 'Stage' line and tags are not a record of the "
+                "outcome: on 2026-09-23 several votes that had passed were still marked 'Pre-voting', and the "
+                "forum records no results. "
+                f"{raw_url(SELF_REPO, SELF_REF, 'guides/casper-governance.md')} gives each vote's published "
+                "outcome, its on-chain tally, how voting works and what each vote changed."),
+            pages=[Page("Validator votes CVV001 to CVV010 (proposal texts)",
+                        f"https://forum.casper.network/raw/{topic}", f"https://forum.casper.network/t/{slug}/{topic}",
+                        title, sort=title.split(":", 1)[0])
+                   for topic, slug, title in GOVERNANCE_VOTES]),
+        Index(
             file="casper-agent-tools/llms.txt",
             title="Casper agent skills and MCP servers",
             summary=(
@@ -759,7 +873,7 @@ def generate(index: Index, report: list[str]) -> list[Link]:
                 report.append(f"  skipped {page.fetch}: {why}")
                 return None
             title = page.title or title_of(body, page.fetch, frontmatter(body))
-            return Link(page.section, title, page.fetch, page.cite, page.fetch)
+            return Link(page.section, title, page.fetch, page.cite, page.sort or page.fetch)
         jobs.append(("page", page.fetch, job))
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
@@ -779,6 +893,8 @@ def generate(index: Index, report: list[str]) -> list[Link]:
         order.setdefault(link.section, len(order))
     links.sort(key=lambda l: (order[l.section], l.sort_key))
 
+    # An index of hand-listed pages only names the sites they come from.
+    sources = sources or [urllib.parse.urlparse(page.fetch).netloc for page in index.pages]
     lines = [f"# {index.title}", "", f"> {index.summary}", "",
              "Each link fetches the page's raw markdown; the URL after the colon is where it is published.",
              f"Generated by https://github.com/msanlisavas/casper-llms from {', '.join(sorted(set(sources)))}.", ""]

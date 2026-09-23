@@ -143,9 +143,11 @@ fetch, grouped into sections.
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | Operator and integrator references for the Casper node software |
 | [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 189 | Developer documentation for the Casper SDKs |
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
+| [`casper-defi/llms.txt`](casper-defi/llms.txt) | 49 | Documentation for the DeFi contracts and apps on Casper mainnet |
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | The Casper Enhancement Proposals from casper-network/ceps |
 | [`odra/llms.txt`](odra/llms.txt) | 53 | Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts |
 | [`casper-x402/llms.txt`](casper-x402/llms.txt) | 21 | The x402 pay-per-request protocol on Casper |
+| [`casper-governance/llms.txt`](casper-governance/llms.txt) | 10 | The proposal texts of the Casper Network's on-chain validator votes |
 | [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 30 | Agent skills, MCP servers and plugins for Casper |
 <!-- indexes:end -->
 
@@ -189,7 +191,10 @@ wrong, even when the page is real and published:
   docs describe versions that are not published, and two of their install lines name packages
   nobody has published - names anyone could claim. They are checked against the npm registry on
   every run and come back automatically once the documented version is published.
-- **Code that no longer compiles.** The .NET SDK tutorials still use 2.x APIs that 3.x removed.
+- **Code that no longer compiles.** The .NET SDK tutorials still use 2.x APIs that 3.x removed,
+  and five docs.casper.network pages teach casper-js-sdk 2.x APIs that 5.x removed or replaced.
+- **Another chain's instructions.** Friendly Market's documentation also covers a lending product
+  and a wallet set-up on the Nibiru chain; only its Casper pages are indexed.
 - **Superseded drafts,** such as pre-release Condor articles and a permits proposal whose API
   changed before it shipped, and one 2024 article that presents AddressableEntity as Casper 2.0's
   account model although mainnet disables it.

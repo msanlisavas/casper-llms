@@ -54,7 +54,7 @@ COMPONENTS = ("casper-node", "casper-client-rs", "casper-sidecar", "casper-walle
 
 # Our indexes in reading order; any other folder with an llms.txt follows alphabetically.
 INDEX_ORDER = ("casper-docs", "casper-guides", "casper-node-tools", "casper-sdks", "casper-standards",
-               "casper-ceps", "odra", "casper-x402", "casper-agent-tools")
+               "casper-defi", "casper-ceps", "odra", "casper-x402", "casper-governance", "casper-agent-tools")
 
 
 def load_json(path: Path) -> dict:
