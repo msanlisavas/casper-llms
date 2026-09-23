@@ -96,6 +96,7 @@ moves.
 - [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-11.
 - [What changed in Casper 2.1 and 2.2](guides/casper-2.1-and-2.2.md). Verified against casper-node v2.2.2 on 2026-09-11.
 - [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 on 2026-09-11.
+- [Casper execution errors: decoding ApiError codes, system-contract errors and rejected transactions](guides/casper-error-codes.md). Verified against casper-node v2.2.2, casper-client-rs v5.0.1, casper-sidecar v2.1.0 and docs.casper.network 2.0.0 on 2026-09-23.
 - [CSPR.name: registering, renewing and resolving .cspr names](guides/cspr-name.md). Verified against cspr-name-contracts 2026.06.23 on 2026-09-12.
 <!-- guides:end -->
 
@@ -133,7 +134,7 @@ fetch, grouped into sections.
 | Index | Pages | Covers |
 |---|---|---|
 | [`casper-docs/llms.txt`](casper-docs/llms.txt) | 221 | The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux |
-| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 5 | Guides written for this repository on what the official Casper documentation does not cover yet |
+| [`casper-guides/llms.txt`](casper-guides/llms.txt) | 6 | Guides written for this repository on what the official Casper documentation does not cover yet |
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | Operator and integrator references for the Casper node software |
 | [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 183 | Developer documentation for the Casper SDKs |
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
