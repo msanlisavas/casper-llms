@@ -424,11 +424,18 @@ def build_indexes() -> list[Index]:
                 "covered by the release notes and changelogs in "
                 f"{raw_url(SELF_REPO, SELF_REF, 'casper-node-tools/llms.txt')}."),
             collections=[
+                # Five pages are left out because their code no longer runs: they teach casper-js-sdk 2.x
+                # (CasperClient, CasperServiceByJsonRPC, DeployUtil, CLValueBuilder, CLPublicKey,
+                # RuntimeArgs, Keys), which the SDK's v2-to-v5 migration guide says 5.x removed or replaced,
+                # and `npm install casper-js-sdk` installs 5.x. script-sdk.md also installs
+                # casper-js-sdk@next. casper-sdks/llms.txt indexes the 5.x documentation instead.
                 Collection(docs_redux, "main", rf"^{re.escape(v2)}.+\.mdx?$",
                            by_first_dir(v2, {"concepts": "Concepts", "developers": "Developers",
                                              "operators": "Operators", "users": "Users",
                                              "resources": "Resources", "economics": "Economics"}),
-                           docusaurus("https://docs.casper.network", casper_sitemap, "/", v2, is_v2_doc)),
+                           docusaurus("https://docs.casper.network", casper_sitemap, "/", v2, is_v2_doc),
+                           exclude=rf"^{re.escape(v2)}(developers/dapps/(sdk/(client-library-usage|script-sdk)"
+                                   r"|technology-stack|template-frontend)|resources/advanced/list-cspr)\.md$"),
                 # condor/ is its own docs plugin, served at /condor. The /pages/condor URLs are an
                 # OLDER duplicate (src/pages/condor) that the site still renders: citing them sent
                 # readers to text different from what was fetched.
@@ -525,7 +532,9 @@ def build_indexes() -> list[Index]:
                 "Developer documentation for the Casper SDKs: the JavaScript/TypeScript SDK (per page, plus "
                 "its changelog and guides), the .NET SDK articles, the Go SDK and its packages, the "
                 "Rust/WebAssembly SDK, the Java SDK, and the Casper Wallet SDK for connecting dApps to the "
-                "Casper Wallet extension. Only documentation for released versions is included."),
+                "Casper Wallet extension; plus the casper-ecosystem donation-demo tutorial, which builds one "
+                "dApp end to end with CSPR.click, casper-js-sdk 5.x transaction builders, an Odra contract and "
+                "CSPR.cloud streaming. Only documentation for released versions is included."),
             collections=[
                 # dev is right here: the GitHub Pages site is published from it.
                 Collection("casper-ecosystem/casper-js-sdk", "dev", r"^site/pages/.+\.mdx$", "JavaScript / TypeScript SDK",
@@ -549,6 +558,10 @@ def build_indexes() -> list[Index]:
                 # Casper 2.0 support.
                 Collection("casper-network/casper-java-sdk", java_release, r"^README\.md$", f"Java SDK ({java_release})"),
                 Collection("make-software/casper-wallet-sdk", "master", r"^README\.md$", "Casper Wallet SDK"),
+                # An end-to-end tutorial written for casper-js-sdk 5.x, where the docs' frontend walkthrough
+                # (template-frontend) teaches 2.x and is left out of casper-docs.
+                Collection("casper-ecosystem/donation-demo", "main", r"^tutorial/[^/]+\.md$",
+                           "End-to-end dApp tutorial (donation-demo)"),
             ]),
         Index(
             file="odra/llms.txt",

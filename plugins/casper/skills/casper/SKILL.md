@@ -108,7 +108,7 @@ The docs' tutorials still show 1.x-era `put-deploy` commands
 | Concepts, accounts, staking, economics, node operation | [Casper Network documentation](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt) (2.0; check the guides) |
 | JSON-RPC methods | The JSON-RPC pages of the [Casper Network documentation](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-docs/llms.txt) (2.0; check the guides); a running sidecar lists its RPC methods and their parameters in answer to `rpc.discover` ([rpc_sidecar README L23-L29](https://github.com/casper-network/casper-sidecar/blob/v2.1.0/rpc_sidecar/README.md?plain=1#L23-L29)) |
 | Node, sidecar, release notes since 2.0 | [Casper node, sidecar and command-line client](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-node-tools/llms.txt) |
-| SDKs: JavaScript/TypeScript, .NET, Go, Rust, Java, Casper Wallet | [Casper SDKs](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-sdks/llms.txt) |
+| SDKs: JavaScript/TypeScript, .NET, Go, Rust, Java, Casper Wallet; a full-stack dApp tutorial on casper-js-sdk 5.x | [Casper SDKs](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-sdks/llms.txt) |
 | Rust smart contracts | [Odra](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/odra/llms.txt); in Claude Code, Odra's own plugin |
 | Token and NFT standards | [CEPs](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-ceps/llms.txt) and [standard implementations](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-standards/llms.txt) |
 | x402 pay-per-call payments | [x402 on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/casper-x402/llms.txt) |

@@ -138,10 +138,10 @@ fetch, grouped into sections.
 <!-- indexes:start -->
 | Index | Pages | Covers |
 |---|---|---|
-| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 221 | The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux |
+| [`casper-docs/llms.txt`](casper-docs/llms.txt) | 216 | The official Casper Network documentation (docs.casper.network), indexed from its source repository casper-network/docs-redux |
 | [`casper-guides/llms.txt`](casper-guides/llms.txt) | 11 | Guides written for this repository on what the official Casper documentation does not cover yet |
 | [`casper-node-tools/llms.txt`](casper-node-tools/llms.txt) | 29 | Operator and integrator references for the Casper node software |
-| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 183 | Developer documentation for the Casper SDKs |
+| [`casper-sdks/llms.txt`](casper-sdks/llms.txt) | 189 | Developer documentation for the Casper SDKs |
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | The Casper Enhancement Proposals from casper-network/ceps |
 | [`odra/llms.txt`](odra/llms.txt) | 53 | Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts |
