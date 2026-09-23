@@ -48,8 +48,9 @@ PRICING = {"free": "Free", "paid": "Paid", "free-and-paid": "Free and paid"}
 # is the date of its newest page edit (YYYY.MM.DD); and a website with no releases, whose version is
 # "shell-" and a digest of the HTML it serves. check.py looks up the latest of each; a guide naming
 # anything else could never be flagged as stale, so validate.py refuses it.
-COMPONENTS = ("casper-node", "casper-client-rs", "docs.casper.network", "cspr-name-contracts",
-              "astralbeam.io", "testnet.astralbeam.io", "docs.astralbeam.io")
+COMPONENTS = ("casper-node", "casper-client-rs", "casper-sidecar", "casper-wallet", "cspr-trade-mcp",
+              "docs.casper.network", "cspr-name-contracts", "liquid-staking-contracts", "casper-trade", "styks",
+              "wcspr", "astralbeam.io", "testnet.astralbeam.io", "docs.astralbeam.io", "docs.friendly.market")
 
 # Our indexes in reading order; any other folder with an llms.txt follows alphabetically.
 INDEX_ORDER = ("casper-docs", "casper-guides", "casper-node-tools", "casper-sdks", "casper-standards",

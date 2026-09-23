@@ -141,9 +141,9 @@ class GuideTests(unittest.TestCase):
         self.assertTrue(any("line 3" in e for e in errors))
 
     def test_a_component_the_weekly_check_cannot_follow_is_refused(self):
-        text = GOOD_GUIDE.replace("casper-node v2.2.2", "casper-sidecar v1.0.0")
+        text = GOOD_GUIDE.replace("casper-node v2.2.2", "casper-js-sdk v5.1.1")
         _, errors = catalog.parse_guide("guides/a.md", text)
-        self.assertTrue(any("casper-sidecar" in e for e in errors))
+        self.assertTrue(any("casper-js-sdk" in e for e in errors))
 
     def test_a_website_is_followed_by_the_digest_of_its_shell(self):
         text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0", "astralbeam.io shell-0d177dc86bed")
@@ -166,6 +166,19 @@ class GuideTests(unittest.TestCase):
                                   "astralbeam.io shell-0d177dc86bed and cspr-name-contracts 2026.06.23")
         guide, _ = catalog.parse_guide("guides/a.md", text)
         self.assertEqual(guide.versions, {"astralbeam.io": "shell-0d177dc86bed", "cspr-name-contracts": "2026.06.23"})
+
+    def test_release_lines_repositories_and_a_documentation_site_can_share_the_line(self):
+        # The DeFi guide rests on contracts in four repositories with no releases, an MCP server's
+        # release and a GitBook site; naming only casper-node would never flag it when they move.
+        text = GOOD_GUIDE.replace("casper-node v2.2.2 and docs.casper.network 2.0.0",
+                                  "casper-node v2.2.2, liquid-staking-contracts 2026.07.20, casper-trade 2026.08.13, "
+                                  "styks 2026.07.13, wcspr 2026.07.13, cspr-trade-mcp v0.6.0 "
+                                  "and docs.friendly.market 2025.09.12")
+        guide, errors = catalog.parse_guide("guides/a.md", text)
+        self.assertEqual(errors, [])
+        self.assertEqual(guide.versions, {"casper-node": "v2.2.2", "liquid-staking-contracts": "2026.07.20",
+                                          "casper-trade": "2026.08.13", "styks": "2026.07.13", "wcspr": "2026.07.13",
+                                          "cspr-trade-mcp": "v0.6.0", "docs.friendly.market": "2025.09.12"})
 
     def test_a_shell_digest_is_exactly_twelve_lowercase_hex_digits(self):
         for bad in ("shell-0d177dc86be", "shell-0d177dc86bed0", "shell-0D177DC86BED", "index-DSzftkm_"):

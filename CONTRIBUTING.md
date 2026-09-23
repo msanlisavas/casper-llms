@@ -115,11 +115,15 @@ not cover. An LLM repeats what it is given, so the rules are strict:
   it wherever it fits: a retrieved passage reaches a reader without the rest of the page.
 - Line 1 is the title (`# ...`), line 2 is blank, and line 3 names what the guide was verified
   against: `Verified against casper-node v2.2.2 on 2026-09-10.` The components the weekly check
-  can follow are `casper-node`, `casper-client-rs`, `docs.casper.network`, `cspr-name-contracts`,
-  `astralbeam.io`, `testnet.astralbeam.io` and `docs.astralbeam.io`. A release line's version is
-  its tag. A repository with no releases is versioned by the date of its newest commit, and a
-  documentation site by the date of its newest page edit, both written `YYYY.MM.DD`. A
-  single-page website is versioned by the digest of the HTML shell it serves, written
+  can follow are the release lines `casper-node`, `casper-client-rs`, `casper-sidecar`,
+  `casper-wallet` and `cspr-trade-mcp`, whose version is a tag; `docs.casper.network`, whose
+  version is the documentation version it serves (`2.0.0`); the repositories with no releases
+  `cspr-name-contracts`, `liquid-staking-contracts`, `casper-trade`, `styks` and `wcspr`; the
+  documentation sites with no releases `docs.astralbeam.io` and `docs.friendly.market`; and the
+  single-page websites `astralbeam.io` and `testnet.astralbeam.io`. A repository with no
+  releases is versioned by the date of its newest commit, and a documentation site by the date
+  of its newest page edit, both written `YYYY.MM.DD`. A single-page website is versioned by the
+  digest of the HTML shell it serves, written
   `shell-<12 hex digits>`; `cd scripts && python -c "import check; print(check.LATEST['astralbeam.io']())"`
   prints the current one.
 - No YAML frontmatter and no HTML, not even inside code: a guide about a website cannot quote the

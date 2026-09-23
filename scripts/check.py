@@ -40,14 +40,23 @@ INITIALIZE = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "par
 LATEST = {
     "casper-node": lambda: latest_release("casper-network/casper-node"),
     "casper-client-rs": lambda: latest_release("casper-ecosystem/casper-client-rs"),
+    "casper-sidecar": lambda: latest_release("casper-network/casper-sidecar"),
+    "casper-wallet": lambda: latest_release("make-software/casper-wallet"),
+    "cspr-trade-mcp": lambda: latest_release("make-software/cspr-trade-mcp"),
     "docs.casper.network": lambda: version_of(released_docs_dir("casper-network/docs-redux", "main")),
     # No releases and no tags: the commit date of its default branch is the version.
     "cspr-name-contracts": lambda: default_branch_date("make-software/cspr-name-contracts"),
+    "liquid-staking-contracts": lambda: default_branch_date("casper-ecosystem/liquid-staking-contracts"),
+    "casper-trade": lambda: default_branch_date("odradev/casper-trade"),
+    "styks": lambda: default_branch_date("odradev/styks"),
+    "wcspr": lambda: default_branch_date("odradev/wcspr"),
     # Single-page sites with no releases: the digest of the HTML shell every path answers.
     "astralbeam.io": lambda: site_shell("https://astralbeam.io/"),
     "testnet.astralbeam.io": lambda: site_shell("https://testnet.astralbeam.io/"),
     # A GitBook site with no releases: the newest page edit in its sitemap.
     "docs.astralbeam.io": lambda: sitemap_date("https://docs.astralbeam.io/sitemap-pages.xml"),
+    # Another GitBook site; its sitemap also dates the Nibiru pages, so an edit there flags too.
+    "docs.friendly.market": lambda: sitemap_date("https://docs.friendly.market/sitemap-pages.xml"),
 }
 
 REPO_PAGE = re.compile(r"^https://github\.com/[^/]+/[^/#?]+/?$")
