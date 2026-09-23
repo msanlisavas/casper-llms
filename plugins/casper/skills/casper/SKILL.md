@@ -120,6 +120,7 @@ The docs' tutorials still show 1.x-era `put-deploy` commands
 | Liquid staking (sCSPR), WCSPR, CSPR.trade's contracts and fees, the Styks price oracle, Friendly Market, csprUSD | [Liquid staking and DeFi on Casper](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-liquid-staking-and-defi.md), checked against the contracts' source and mainnet state, with a list of what their READMEs get wrong |
 | Validator votes CVV001 to CVV010, how on-chain voting works, the Casper Association's delegation policy, board and published accounts | [Casper governance](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-governance.md): each vote's proposal, published outcome, on-chain tally and effect, dated |
 | The roadmap and the Casper Manifest, EVM, Solidity or MetaMask support, addressable entities, CEP-97's fee changes, csprUSD | [Casper roadmap and EVM status](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-roadmap-and-evm.md): each roadmap item against the chainspec mainnet runs, with every plan dated and framed as a plan |
+| Where CSPR trades, which wallets, explorers and dApps still work, Casper Labs and Prove AI, grants and hackathons, partnerships, past network halts and incidents | [The Casper ecosystem in 2026](https://raw.githubusercontent.com/msanlisavas/casper-llms/main/guides/casper-ecosystem-2026.md), which dates every listing and liveness check; it gives no prices |
 
 ## Live chain data
 
