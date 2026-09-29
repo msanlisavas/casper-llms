@@ -95,7 +95,7 @@ moves.
 - [AstralBeam, the Casper-EVM bridge: launch status, roadmap, audit and public testnet](guides/astralbeam.md). Verified against astralbeam.io shell-0d177dc86bed, testnet.astralbeam.io shell-624443a40eb2 and docs.astralbeam.io 2026.09.21 on 2026-09-23.
 - [Where the Casper 2.0 docs differ from mainnet today](guides/casper-2.0-docs-vs-mainnet.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-11.
 - [What changed in Casper 2.1 and 2.2](guides/casper-2.1-and-2.2.md). Verified against casper-node v2.2.2 on 2026-09-11.
-- [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 on 2026-09-11.
+- [casper-client 5.x: sending transactions on Casper 2.x](guides/casper-client-5.md). Verified against casper-client-rs v5.0.1 and casper-node v2.2.2 on 2026-09-11.
 - [The Casper ecosystem in 2026: exchanges, wallets, live and dead projects, Prove AI, grants and network incidents](guides/casper-ecosystem-2026.md). Verified against casper-node v2.2.2 and docs.casper.network 2.0.0 on 2026-09-23.
 - [Casper execution errors: decoding ApiError codes, system-contract errors and rejected transactions](guides/casper-error-codes.md). Verified against casper-node v2.2.2, casper-client-rs v5.0.1, casper-sidecar v2.1.0 and docs.casper.network 2.0.0 on 2026-09-23.
 - [Casper governance: validator votes CVV001 to CVV010, the Casper Association and its published accounts](guides/casper-governance.md). Verified against casper-node v2.2.2 on 2026-09-23.
