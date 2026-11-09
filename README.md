@@ -145,10 +145,10 @@ fetch, grouped into sections.
 | [`casper-standards/llms.txt`](casper-standards/llms.txt) | 28 | Reference implementations and guides for Casper's token standards from the casper-ecosystem organization |
 | [`casper-defi/llms.txt`](casper-defi/llms.txt) | 49 | Documentation for the DeFi contracts and apps on Casper mainnet |
 | [`casper-ceps/llms.txt`](casper-ceps/llms.txt) | 45 | The Casper Enhancement Proposals from casper-network/ceps |
-| [`odra/llms.txt`](odra/llms.txt) | 53 | Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts |
+| [`odra/llms.txt`](odra/llms.txt) | 56 | Documentation for Odra, the Rust framework for writing, testing and deploying Casper smart contracts |
 | [`casper-x402/llms.txt`](casper-x402/llms.txt) | 21 | The x402 pay-per-request protocol on Casper |
 | [`casper-governance/llms.txt`](casper-governance/llms.txt) | 10 | The proposal texts of the Casper Network's on-chain validator votes |
-| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 30 | Agent skills, MCP servers and plugins for Casper |
+| [`casper-agent-tools/llms.txt`](casper-agent-tools/llms.txt) | 31 | Agent skills, MCP servers and plugins for Casper |
 <!-- indexes:end -->
 
 Point a tool at any raw file, e.g.
